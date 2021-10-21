@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  pbpm:
+    build: .
+    hostname: pbpm
+    container_name: pbpm
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/pbpm
