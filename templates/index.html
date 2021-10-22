@@ -14,9 +14,16 @@
             <button class="btn btn-secondary form-control mb-1" v-on:click="selectTab('map')">Exit</button>
             <div class="input-group mb-1">
               <span class="input-group-text" id="basic-addon1">Add a Station</span>
-              <select class="form-control" v-on:change="mapAdd" v-model="form.add.station_code">
+              <select class="form-control" v-on:change="mapAddStation" v-model="form.add.station_code">
                 <option></option>
                 <option v-for="record, code in landscape.station" :value="code">[[code]]: [[record.name]]</option>
+              </select>
+            </div>
+            <div class="input-group mb-1">
+              <span class="input-group-text" id="basic-addon1">Add a Service</span>
+              <select class="form-control" v-on:change="mapAddService" v-model="form.add.service_code">
+                <option></option>
+                <option v-for="record, code in landscape.service" :value="code">[[code]]</option>
               </select>
             </div>
             <ol class="list-group list-group-numbered">
@@ -25,7 +32,8 @@
                   <div class="fw-bold">[[node.code]]</div>
                   <span v-if="landscape.station[node.code] != undefined">[[landscape.station[node.code].name]]</span>
                 </div>
-                <span class="badge bg-primary rounded-pill">Station</span>
+                <span class="badge bg-primary rounded-pill" v-if="node.type == 'station'">Station</span>
+                <span class="badge bg-success rounded-pill" v-if="node.type == 'service'">Service</span>
               </li>
             </ol>
           </div>

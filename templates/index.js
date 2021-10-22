@@ -50,11 +50,21 @@ var pbpmApp = new Vue(
       ctx.fillStyle = 'green';
       ctx.fillRect(10, 10, 10, 10);
     },
-    mapAdd(e) {
-      var record = { 'type': 'station', 'code': this.form.add.station_code };
-      this.landscape.map[this.form.code].config.push(record);
-      this.form.add.station_code = '';
-      this.save();
+    mapAddStation(e) {
+      if (this.form.add.station_code != '') {
+        var record = { 'type': 'station', 'code': this.form.add.station_code };
+        this.landscape.map[this.form.code].config.push(record);
+        this.form.add.station_code = '';
+        this.save();
+      }
+    },
+    mapAddService(e) {
+      if (this.form.add.service_code != '') {
+        var record = { 'type': 'service', 'code': this.form.add.service_code };
+        this.landscape.map[this.form.code].config.push(record);
+        this.form.add.service_code = '';
+        this.save();
+      }
     },
     mapSelect(config_id) {
       if (this.form.edit == config_id) {

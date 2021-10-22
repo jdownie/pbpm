@@ -25,7 +25,7 @@
         {
           "type": "station",
           "code": "BEGIN",
-          "leads_to": 2
+          "leads_to": 6
         },
         {
           "type": "station",
@@ -50,6 +50,19 @@
           "type": "station",
           "code": "QA",
           "leads_to": 1
+        },
+        {
+          "type": "service",
+          "code": "GENERAL",
+          "leads_to": 2
+        },
+        {
+          "type": "service",
+          "code": "RANDOM"
+        },
+        {
+          "type": "service",
+          "code": "GENERAL"
         }
       ]
     },
