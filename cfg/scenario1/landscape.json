@@ -1,9 +1,22 @@
 {
-  "maps": {},
+  "map": {
+    "ND": {
+      "name": "New Designs"
+    },
+    "AUC": {
+      "name": "Author's Correction"
+    }
+  },
   "station": {
-    "PREPRESS": "Prepress",
-    "QA": "Quality Check",
-    "WCINSPECT": "Web Center Inspection"
+    "PREPRESS": {
+      "name": "Prepress"
+    },
+    "QA": {
+      "name": "Quality Check"
+    },
+    "WCINSPECT": {
+      "name": "Web Center Inspection"
+    }
   },
   "service": {
     "GENERAL": {
@@ -13,5 +26,24 @@
       "url_template": "http://localhost:5000/test/random/"
     }
   },
-  "owner": {}
+  "owner": {
+    "james.downie": {
+      "name": "James Downie"
+    },
+    "john.doe": {
+      "name": "John Doe"
+    },
+    "payl.mccartney": {
+      "name": "Paul McCartney"
+    },
+    "ginro.starr": {
+      "name": "Ringo Starr"
+    },
+    "john.lennon": {
+      "name": "John Lennon"
+    },
+    "george.harrison": {
+      "name": "George Harrison"
+    }
+  }
 }
