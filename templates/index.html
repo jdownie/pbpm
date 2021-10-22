@@ -18,154 +18,32 @@
             <div class="tabbody" v-if="tab == 'welcome'">
               <h1>Welcome</h1>
             </div>
-            <div class="tabbody datagrid" v-if="tab == 'station'">
+            <div class="tabbody datagrid" v-if="[ 'station', 'service', 'owner', 'map' ].indexOf(tab) != -1">
               <div class="row" v-if="form != null">
                 <div class="col">
                   <table class="table">
                     <thead>
                       <tr>
-                        <th>Code</th>
-                        <th>Label</th>
-                        <th></th>
-                      </tr>
-                      <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.station_code" @keyup.enter="addItem('station')">
+                          <input type="text" class="form-control" v-model="form.code" @keyup.enter="addItem(tab)" placeholder="Code">
+                        </td>
+                        <td v-for="label, field in cfg.table[tab].fields">
+                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem(tab)" :placeholder="label">
                         </td>
                         <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('station')">
-                        </td>
-                        <td>
-                          <button class="btn btn-success form-control" v-on:click="addItem('station')">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="addItem(tab)">&plus;</button>
                         </td>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="record, station_code in landscape.station">
-                        <td>[[station_code]]</td>
-                        <td v-if="form.edit_station_code == station_code">
-                          <input type="text" class="form-control" v-model="landscape.station[form.edit_station_code].name" @keyup.enter="editItemEnd('station');">
+                      <tr v-for="record, code in landscape[tab]">
+                        <td>[[code]]</td>
+                        <td v-if="form.edit_code == code" v-for="label, field in cfg.table[tab].fields">
+                          <input type="text" class="form-control" v-model="landscape[tab][form.edit_code][field]" @keyup.enter="editItemEnd(tab);">
                         </td>
-                        <td v-else v-on:click="editItemBegin('station', station_code)">[[record.name]]</td>
+                        <td v-else v-on:click="editItemBegin(tab, code)">[[(record[field])]]</td>
                         <td>
-                          <button class="btn btn-danger form-control" v-on:click="delItem('station', station_code)">&times;</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="tabbody datagrid" v-if="tab == 'service'">
-              <div class="row" v-if="form != null">
-                <div class="col">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Code</th>
-                        <th>URL Template</th>
-                        <th></th>
-                      </tr>
-                      <tr>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.service_code" @keyup.enter="addItem('service')">
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.url_template" @keyup.enter="addItem('service')">
-                        </td>
-                        <td>
-                          <button class="btn btn-success form-control" v-on:click="addItem('service')">&plus;</button>
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="record, service_code in landscape.service">
-                        <td>[[service_code]]</td>
-                        <td v-if="form.edit_service_code == service_code">
-                          <input type="text" class="form-control" v-model="landscape.service[form.edit_service_code].url_template" @keyup.enter="editItemEnd('service');">
-                        </td>
-                        <td v-else v-on:click="editItemBegin('service', service_code)">[[record.url_template]]</td>
-                        <td>
-                          <button class="btn btn-danger form-control" v-on:click="delItem('service', service_code)">&times;</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="tabbody datagrid" v-if="tab == 'owner'">
-              <div class="row" v-if="form != null">
-                <div class="col">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th></th>
-                      </tr>
-                      <tr>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.owner_code" @keyup.enter="addItem('owner')">
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('owner')">
-                        </td>
-                        <td>
-                          <button class="btn btn-success form-control" v-on:click="addItem('owner')">&plus;</button>
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="record, owner_code in landscape.owner">
-                        <td>[[owner_code]]</td>
-                        <td v-if="form.edit_owner_code == owner_code">
-                          <input type="text" class="form-control" v-model="landscape.owner[form.edit_owner_code].name" @keyup.enter="editItemEnd('owner');">
-                        </td>
-                        <td v-else v-on:click="editItemBegin('owner', owner_code)">[[record.name]]</td>
-                        <td>
-                          <button class="btn btn-danger form-control" v-on:click="delItem('owner', owner_code)">&times;</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="tabbody datagrid" v-if="tab == 'map'">
-              <div class="row" v-if="form != null">
-                <div class="col">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th></th>
-                      </tr>
-                      <tr>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.map_code" @keyup.enter="addItem('map')">
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('map')">
-                        </td>
-                        <td>
-                          <button class="btn btn-success form-control" v-on:click="addItem('map')">&plus;</button>
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="record, map_code in landscape.map">
-                        <td>[[map_code]]</td>
-                        <td v-if="form.edit_map_code == map_code">
-                          <input type="text" class="form-control" v-model="landscape.map[form.edit_map_code].name" @keyup.enter="editItemEnd('map');">
-                        </td>
-                        <td v-else v-on:click="editItemBegin('map', map_code)">[[record.name]]</td>
-                        <td>
-                          <div class="btn-group" role="group" aria-label="Basic example">
-                            <button class="btn btn-primary form-control" v-on:click="editMap(map_code)">&#128393;</button>
-                            <button class="btn btn-danger form-control" v-on:click="delItem('map', map_code)">&times;</button>
-                          </div>
+                          <button class="btn btn-danger form-control" v-on:click="delItem(tab, code)">&times;</button>
                         </td>
                       </tr>
                     </tbody>

@@ -12,11 +12,11 @@ var pbpmApp = new Vue(
               , 'owner': 'Owners'
               , 'map': 'Maps'
               },
-      'cfg': { 'field_map':
-               { 'station': { 'form_key': 'station_code', 'form_fields': [ 'name' ] }
-               , 'service': { 'form_key': 'service_code', 'form_fields': [ 'url_template' ] }
-               , 'owner': { 'form_key': 'owner_code', 'form_fields': [ 'name' ] }
-               , 'map': { 'form_key': 'map_code', 'form_fields': [ 'name' ] }
+      'cfg': { 'table':
+               { 'station': { 'label': 'Stations', 'fields': { 'name': 'Name' } }
+               , 'service': { 'label': 'Services', 'fields': { 'url_template': 'URL Template' } }
+               , 'owner': { 'label': 'Owners', 'fields': { 'name': 'Name' } }
+               , 'map': { 'label': 'Maps', 'fields': { 'name': 'Name' } }
                }
              }
     }
@@ -38,26 +38,24 @@ var pbpmApp = new Vue(
       jQuery.get('/landscape/get/', {}, function(data) { pbpmApp.landscape = data; }, 'json');
     },
     addItem: function(item) {
-      var map = this.cfg.field_map;
+      var map = this.cfg.table;
       if (map[item] != undefined) {
         var record = {};
-        var form_fields = map[item].form_fields;
-        for (var f in form_fields) {
-          var form_field = form_fields[f];
-          record[form_field] = this.form[form_field];
+        var fields = map[item].fields;
+        for (var field in fields) {
+          record[field] = this.form[field];
         }
-        var form_key = map[item].form_key;
-        this.landscape[item][this.form[form_key]] = record;
+        this.landscape[item][this.form['code']] = record;
       }
       this.save();
       this.resetForm();
     },
     editItemBegin(item, code) {
-      this.form['edit_' + item + '_code'] = code;
+      this.form['edit_code'] = code;
       this.vueRender();
     },
     editItemEnd(item) {
-      delete this.form['edit_' + item + '_code'];
+      delete this.form.edit_code;
       this.vueRender();
       this.save();
     },
@@ -67,14 +65,13 @@ var pbpmApp = new Vue(
       this.save();
     },
     resetForm: function() {
-      var map = this.cfg.field_map;
+      var map = this.cfg.table;
       if (map[this.tab] != undefined) {
         var record = {};
-        record[this.tab + '_code'] = '';
-        var form_fields = map[this.tab].form_fields;
-        for (var f in form_fields) {
-          var form_field = form_fields[f];
-          record[form_field] = '';
+        record['code'] = '';
+        var fields = map[this.tab].fields;
+        for (var field in fields) {
+          record[field] = '';
         }
         console.log(record);
         this.form = record;
