@@ -1,9 +1,6 @@
-#pbpm {
-  display: none;
-}
-body {
-  padding-top: 20px;
-}
+#pbpm { display: none; }
+#diagram { width: 100%; }
+body { padding-top: 20px; }
 .tabbody {
   padding: 20px;
   border-color: #ffffff #dee2e6 #dee2e6 #dee2e6;
@@ -13,6 +10,9 @@ body {
 }
 .tabbody.datagrid table.table td { font-size: 18pt; }
 .tabbody.datagrid table.table th { font-size: 18pt; }
+/*
 .tabbody.datagrid table.table thead>tr>th:first-child { width: 20%; }
 .tabbody.datagrid table.table thead>tr>th:last-child { width: 20px; }
+*/
 .tabbody.datagrid table.table button.btn { font-size: 12pt; font-weight: bold; }
+.tabbody.datagrid table.table .btn-group { width: 100%; }

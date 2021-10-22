@@ -26,6 +26,22 @@ class pbpm:
     ret = os.path.join(self.path, "{0}.log".format(datetime.now().strftime("%Y%m%d"))) if file_code == pbpmFileEnum.log else ret
     return ret
 
+  def __mend(self):
+    for map_code in self.landscape["map"]:
+      if not "config" in self.landscape["map"][map_code].keys():
+        self.landscape["map"][map_code]["config"] = list()
+      required_stations = { "BEGIN": True, "END": True }
+      for i in range(len(self.landscape["map"][map_code]["config"])):
+        node = self.landscape["map"][map_code]["config"][i]
+        if node["type"] == "station" and node["code"] in required_stations.keys():
+          required_stations[node["code"]] = False
+      for station_code in required_stations.keys():
+        if required_stations[station_code]:
+          node = { "type": "station", "code": station_code }
+          print(station_code, file=sys.stderr)
+          print(json.dumps(self.landscape["map"][map_code]), file=sys.stderr)
+          self.landscape["map"][map_code]["config"].append(node)
+
   def __log(self, entry):
     dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
     line = "{0} - {1}\n".format(dt, entry)
@@ -56,10 +72,10 @@ class pbpm:
       self.landscape = json.load(fin)
       fin.close()
     else:
-      ds = [ "maps", "station", "service", "owner" ]
+      ds = [ "map", "station", "service", "owner" ]
       for d in ds:
         self.landscape[d] = dict()
-    print("Loaded configuration from {0}".format(self.path))
+      print("Loaded configuration from {0}".format(self.path))
     return self
 
   def save(self):
@@ -67,6 +83,7 @@ class pbpm:
     Save the configuration.
     :return: None
     """
+    self.__mend()
     landscape_path = self.__path(pbpmFileEnum.landscape)
     self.__log("Saving landscape to {0}".format(landscape_path))
     fout = open(landscape_path, "w")

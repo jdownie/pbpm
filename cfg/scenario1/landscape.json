@@ -1,10 +1,87 @@
 {
   "map": {
     "ND": {
-      "name": "New Designs"
+      "name": "New Designs",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 2
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "PREPRESS",
+          "leads_to": 1
+        }
+      ]
     },
     "AUC": {
-      "name": "Author's Correction"
+      "name": "Author's Correction",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 2
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "PREPRESS",
+          "leads_to": 3
+        },
+        {
+          "type": "station",
+          "code": "QA",
+          "leads_to": 4
+        },
+        {
+          "type": "station",
+          "code": "WCINSPECT",
+          "leads_to": 5
+        },
+        {
+          "type": "station",
+          "code": "QA",
+          "leads_to": 1
+        }
+      ]
+    },
+    "ALT": {
+      "name": "Alteration",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN"
+        },
+        {
+          "type": "station",
+          "code": "END"
+        }
+      ]
+    },
+    "aaa": {
+      "name": "AAA",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN"
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "PREPRESS"
+        }
+      ]
     }
   },
   "station": {

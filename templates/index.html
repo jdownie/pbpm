@@ -8,11 +8,54 @@
   <body>
     <div id="pbpm">
       <div class="container-fluid" v-if="landscape != null">
-        <div class="row">
+        <div class="row" v-if="tab == 'editMap'">
+          <h1>[[form.code]] - [[landscape.map[form.code].name]]</h1>
+          <div class="col-4">
+            <button class="btn btn-secondary form-control mb-1" v-on:click="selectTab('map')">Exit</button>
+            <div class="input-group mb-1">
+              <span class="input-group-text" id="basic-addon1">Add a Station</span>
+              <select class="form-control" v-on:change="mapAdd" v-model="form.add.station_code">
+                <option></option>
+                <option v-for="record, code in landscape.station" :value="code">[[code]]: [[record.name]]</option>
+              </select>
+            </div>
+            <ol class="list-group list-group-numbered">
+              <li class="list-group-item d-flex justify-content-between align-items-start" :class="{ 'active': form.edit == i }" v-for="node, i in landscape.map[form.code].config" v-on:click="mapSelect(i)">
+                <div class="ms-2 me-auto">
+                  <div class="fw-bold">[[node.code]]</div>
+                  <span v-if="landscape.station[node.code] != undefined">[[landscape.station[node.code].name]]</span>
+                </div>
+                <span class="badge bg-primary rounded-pill">Station</span>
+              </li>
+            </ol>
+          </div>
+          <div class="col-4">
+            <div id="diagram"></div>
+            <hr />
+            <div v-if="form.edit != null">
+              <div class="row" v-if="landscape.map[form.code].config[form.edit].code != 'END'">
+                <div class="input-group mb-1">
+                  <span class="input-group-text" id="basic-addon1">Leads to...</span>
+                  <select class="form-control" v-model="form.leads_to" v-on:change="linkMap">
+                    <option></option>
+                    <option v-for="record, i in landscape.map[form.code].config" :value="i" v-if="i != form.edit">[[ landscape | configStepLabel(record, form.code, i) ]]</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <pre>[[form]]</pre>
+          </div>
+          <div class="col-4">
+          </div>
+        </div>
+        <div class="row" v-else>
           <div class="col">
             <ul class="nav nav-tabs">
-              <li class="nav-item" v-for="lbl, key in tabs" v-on:click="selectTab(key)">
-                <a class="nav-link" :class="{ 'active': tab == key }" aria-current="page" href="#">[[lbl]]</a>
+              <li class="nav-item" v-on:click="selectTab('welcome')">
+                <a class="nav-link" :class="{ 'active': tab == 'welcome' }" aria-current="page" href="#">Welcome</a>
+              </li>
+              <li class="nav-item" v-for="record, t in cfg.table" v-on:click="selectTab(t)">
+                <a class="nav-link" :class="{ 'active': tab == t }" aria-current="page" href="#">[[record.label]]</a>
               </li>
             </ul>
             <div class="tabbody" v-if="tab == 'welcome'">
@@ -43,7 +86,10 @@
                         </td>
                         <td v-else v-on:click="editItemBegin(tab, code)">[[(record[field])]]</td>
                         <td>
-                          <button class="btn btn-danger form-control" v-on:click="delItem(tab, code)">&times;</button>
+                          <div class="btn-group" role="group" aria-label="Basic example">
+                            <button class="btn btn-primary form-control" v-if="tab == 'map'" v-on:click="editMap(code)">&#128393;</button>
+                            <button class="btn btn-danger form-control" v-on:click="delItem('map', code)">&times;</button>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
@@ -60,9 +106,13 @@
           <div class="col">
             <pre>[[form]]</pre>
           </div>
+          <div class="col">
+            <pre>[[landscape.map[form.code].config]]</pre>
+          </div>
         </div>
       </div>
     </div>
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>

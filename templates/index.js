@@ -6,12 +6,6 @@ var pbpmApp = new Vue(
       'tab': null,
       'form': null,
       'landscape': null,
-      'tabs': { 'welcome': 'Welcome'
-              , 'station': 'Stations'
-              , 'service': 'Services'
-              , 'owner': 'Owners'
-              , 'map': 'Maps'
-              },
       'cfg': { 'table':
                { 'station': { 'label': 'Stations', 'fields': { 'name': 'Name' } }
                , 'service': { 'label': 'Services', 'fields': { 'url_template': 'URL Template' } }
@@ -23,20 +17,63 @@ var pbpmApp = new Vue(
     }
   }
 , mounted() {
-    this.selectTab('map');
     this.load();
     $('#pbpm').fadeIn();
-    window.addEventListener("dblclick", function(event) {
-      pbpmApp.cfg.debug = ! pbpmApp.cfg.debug;
-     }, false);
+    window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
+    //this.selectTab('map');
+    window.setTimeout(function() {
+      pbpmApp.editMap('AUC');
+    }, 500);
   }
+, filters: {
+  configStepLabel: function(landscape, record, map_code, i) {
+    var type = record.type.toUpperCase();
+    var ret = ( i + 1 ) + ') ' + type + ':' + record.code;
+    var label = '';
+    if (type == 'STATION') {
+      if ( landscape.station[record.code] != undefined) {
+        label = ' - ' + landscape.station[record.code].name;
+      }
+    }
+    ret = ret + label;
+    return ret;
+  }
+}
 , methods: {
+    drawMapNode: function() {
+      var w = $('#diagram').width();
+      $('#diagram').html('<canvas id="diagramCanvas"></canvas>');
+      $('#diagramCanvas').css('width', w + 'px').css('height', w / 2 + 'px');
+      console.log(this.form);
+      const canvas = document.getElementById('diagramCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'green';
+      ctx.fillRect(10, 10, 10, 10);
+    },
+    mapAdd(e) {
+      var record = { 'type': 'station', 'code': this.form.add.station_code };
+      this.landscape.map[this.form.code].config.push(record);
+      this.form.add.station_code = '';
+      this.save();
+    },
+    mapSelect(config_id) {
+      if (this.form.edit == config_id) {
+        this.form.edit = null;
+        this.form.leads_to = null;
+      } else {
+        this.form.edit = config_id;
+        if (this.landscape.map[this.form.code].config[this.form.edit].leads_to != undefined) {
+          this.form.leads_to = this.landscape.map[this.form.code].config[this.form.edit].leads_to;
+        }
+      }
+      this.drawMapNode();
+    },
     vueRender: function() {
       this.form      = JSON.parse(JSON.stringify(this.form));
       this.landscape = JSON.parse(JSON.stringify(this.landscape));
     },
     save: function() {
-      jQuery.post('/landscape/put/', JSON.stringify(this.landscape), null, 'text');
+      jQuery.post('/landscape/put/', JSON.stringify(this.landscape), function(data) { pbpmApp.landscape = data; }, 'json');
     },
     load: function() {
       jQuery.get('/landscape/get/', {}, function(data) { pbpmApp.landscape = data; }, 'json');
@@ -68,6 +105,25 @@ var pbpmApp = new Vue(
       this.vueRender();
       this.save();
     },
+    linkMap: function() {
+      var src = this.form.edit;
+      var dst = this.form.leads_to;
+      // First of all, make sure that nothing else leads to this node...
+      var cfg = this.landscape.map[this.form.code].config;
+      for (var i in cfg) {
+        if (cfg[i].leads_to == dst) {
+          delete cfg[i].leads_to;
+        }
+      }
+      cfg[src].leads_to = dst;
+      delete this.form.leads_to;
+      this.form.edit = null;
+      this.save();
+    },
+    editMap: function(code) {
+      this.selectTab('editMap');
+      this.form = { 'code': code, 'add': { 'station_code': '' }, 'edit': null, 'leads_to': '' };
+    },
     resetForm: function() {
       var map = this.cfg.table;
       if (map[this.tab] != undefined) {
@@ -77,7 +133,6 @@ var pbpmApp = new Vue(
         for (var field in fields) {
           record[field] = '';
         }
-        console.log(record);
         this.form = record;
         this.vueRender();
       } else {
