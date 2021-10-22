@@ -1,0 +1,17 @@
+{
+  "maps": {},
+  "station": {
+    "PREPRESS": "Prepress",
+    "QA": "Quality Check",
+    "WCINSPECT": "Web Center Inspection"
+  },
+  "service": {
+    "GENERAL": {
+      "url_template": "http://localhost:5000/test/general/?x=2&y=3"
+    },
+    "RANDOM": {
+      "url_template": "http://localhost:5000/test/random/"
+    }
+  },
+  "owner": {}
+}

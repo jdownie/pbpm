@@ -4,7 +4,9 @@ services:
     build: .
     hostname: pbpm
     container_name: pbpm
+    environment:
+      - PBPM_CONFIG=cfg/scenario1
     ports:
-      - "5000:5000"
+      - 5000:5000
     volumes:
       - .:/pbpm
