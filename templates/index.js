@@ -7,15 +7,22 @@ var pbpmApp = new Vue(
       'form': null,
       'landscape': null,
       'tabs': { 'welcome': 'Welcome'
-              , 'stations': 'Stations'
-              , 'services': 'Services'
-              , 'owners': 'Owners'
-              , 'maps': 'Maps'
-              }
+              , 'station': 'Stations'
+              , 'service': 'Services'
+              , 'owner': 'Owners'
+              , 'map': 'Maps'
+              },
+      'cfg': { 'field_map':
+               { 'station': { 'form_key': 'station_code', 'form_fields': [ 'name' ] }
+               , 'service': { 'form_key': 'service_code', 'form_fields': [ 'url_template' ] }
+               , 'owner': { 'form_key': 'owner_code', 'form_fields': [ 'name' ] }
+               , 'map': { 'form_key': 'map_code', 'form_fields': [ 'name' ] }
+               }
+             }
     }
   }
 , mounted() {
-    this.selectTab('maps');
+    this.selectTab('map');
     this.load();
     $('#pbpm').fadeIn();
   }
@@ -31,65 +38,47 @@ var pbpmApp = new Vue(
       jQuery.get('/landscape/get/', {}, function(data) { pbpmApp.landscape = data; }, 'json');
     },
     addItem: function(item) {
-      if (item == 'station') {
-        this.landscape.station[this.form.station_code] = { 'name': this.form.name };
-      } else if (item == 'service') {
-        this.landscape.service[this.form.service_code] = { 'url_template': this.form.url_template };
-      } else if (item == 'owner') {
-        this.landscape.owner[this.form.owner_code] = { 'name': this.form.name };
-      } else if (item == 'map') {
-        this.landscape.map[this.form.map_code] = { 'name': this.form.name };
+      var map = this.cfg.field_map;
+      if (map[item] != undefined) {
+        var record = {};
+        var form_fields = map[item].form_fields;
+        for (var f in form_fields) {
+          var form_field = form_fields[f];
+          record[form_field] = this.form[form_field];
+        }
+        var form_key = map[item].form_key;
+        this.landscape[item][this.form[form_key]] = record;
       }
       this.save();
       this.resetForm();
     },
     editItemBegin(item, code) {
-      if (item == 'station') {
-        this.form.edit_station_code = code;
-      } else if (item == 'service') {
-        this.form.edit_service_code = code;
-      } else if (item == 'owner') {
-        this.form.edit_owner_code = code;
-      } else if (item == 'map') {
-        this.form.edit_map_code = code;
-      }
+      this.form['edit_' + item + '_code'] = code;
       this.vueRender();
     },
     editItemEnd(item) {
-      if (item == 'station') {
-        delete this.form.edit_station_code;
-      } else if (item == 'service') {
-        delete this.form.edit_service_code;
-      } else if (item == 'owner') {
-        delete this.form.edit_owner_code;
-      } else if (item == 'map') {
-        delete this.form.edit_map_code;
-      }
+      delete this.form['edit_' + item + '_code'];
       this.vueRender();
       this.save();
     },
     delItem: function(item, code) {
-      if (item == 'station') {
-        delete this.landscape.station[code];
-      } else if (item == 'service') {
-        delete this.landscape.service[code];
-      } else if (item == 'owner') {
-        delete this.landscape.owner[code];
-      } else if (item == 'map') {
-        delete this.landscape.map[code];
-      }
+      delete this.landscape[item][code];
       this.vueRender();
       this.save();
     },
     resetForm: function() {
-      if (this.tab == 'stations') {
-        this.form = { 'station_code': '', 'name': '' }
-      } else if (this.tab == 'services') {
-        this.form = { 'service_code': '', 'url_template': '' }
-      } else if (this.tab == 'owners') {
-        this.form = { 'owner_code': '', 'name': '' }
-      } else if (this.tab == 'maps') {
-        this.form = { 'map_code': '', 'name': '' }
+      var map = this.cfg.field_map;
+      if (map[this.tab] != undefined) {
+        var record = {};
+        record[this.tab + '_code'] = '';
+        var form_fields = map[this.tab].form_fields;
+        for (var f in form_fields) {
+          var form_field = form_fields[f];
+          record[form_field] = '';
+        }
+        console.log(record);
+        this.form = record;
+        this.vueRender();
       } else {
         this.form = null;
       }
