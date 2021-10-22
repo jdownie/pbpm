@@ -30,13 +30,13 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.station_code" @keyup.enter="addStation">
+                          <input type="text" class="form-control" v-model="form.station_code" @keyup.enter="addItem('station')">
                         </td>
                         <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addStation">
+                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('station')">
                         </td>
                         <td>
-                          <button class="btn btn-success form-control" v-on:click="addStation">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="addItem('station')">&plus;</button>
                         </td>
                       </tr>
                     </thead>
@@ -44,11 +44,11 @@
                       <tr v-for="record, station_code in landscape.station">
                         <td>[[station_code]]</td>
                         <td v-if="form.edit_station_code == station_code">
-                          <input type="text" class="form-control" v-model="landscape.station[form.edit_station_code].name" @keyup.enter="editStationEnd();">
+                          <input type="text" class="form-control" v-model="landscape.station[form.edit_station_code].name" @keyup.enter="editItemEnd('station');">
                         </td>
-                        <td v-else v-on:click="editStationBegin(station_code)">[[record.name]]</td>
+                        <td v-else v-on:click="editItemBegin('station', station_code)">[[record.name]]</td>
                         <td>
-                          <button class="btn btn-danger form-control" v-on:click="delStation(station_code)">&times;</button>
+                          <button class="btn btn-danger form-control" v-on:click="delItem('station', station_code)">&times;</button>
                         </td>
                       </tr>
                     </tbody>
@@ -68,13 +68,13 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.service_code" @keyup.enter="addService">
+                          <input type="text" class="form-control" v-model="form.service_code" @keyup.enter="addItem('service')">
                         </td>
                         <td>
-                          <input type="text" class="form-control" v-model="form.url_template" @keyup.enter="addService">
+                          <input type="text" class="form-control" v-model="form.url_template" @keyup.enter="addItem('service')">
                         </td>
                         <td>
-                          <button class="btn btn-success form-control" v-on:click="addService">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="addItem('service')">&plus;</button>
                         </td>
                       </tr>
                     </thead>
@@ -82,11 +82,11 @@
                       <tr v-for="record, service_code in landscape.service">
                         <td>[[service_code]]</td>
                         <td v-if="form.edit_service_code == service_code">
-                          <input type="text" class="form-control" v-model="landscape.service[form.edit_service_code].url_template" @keyup.enter="editServiceEnd();">
+                          <input type="text" class="form-control" v-model="landscape.service[form.edit_service_code].url_template" @keyup.enter="editItemEnd('service');">
                         </td>
-                        <td v-else v-on:click="editServiceBegin(service_code)">[[record.url_template]]</td>
+                        <td v-else v-on:click="editItemBegin('service', service_code)">[[record.url_template]]</td>
                         <td>
-                          <button class="btn btn-danger form-control" v-on:click="delService(service_code)">&times;</button>
+                          <button class="btn btn-danger form-control" v-on:click="delItem('service', service_code)">&times;</button>
                         </td>
                       </tr>
                     </tbody>
@@ -106,13 +106,13 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.owner_code" @keyup.enter="addOwner">
+                          <input type="text" class="form-control" v-model="form.owner_code" @keyup.enter="addItem('owner')">
                         </td>
                         <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addOwner">
+                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('owner')">
                         </td>
                         <td>
-                          <button class="btn btn-success form-control" v-on:click="addOwner">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="addItem('owner')">&plus;</button>
                         </td>
                       </tr>
                     </thead>
@@ -120,11 +120,11 @@
                       <tr v-for="record, owner_code in landscape.owner">
                         <td>[[owner_code]]</td>
                         <td v-if="form.edit_owner_code == owner_code">
-                          <input type="text" class="form-control" v-model="landscape.owner[form.edit_owner_code].name" @keyup.enter="editOwnerEnd();">
+                          <input type="text" class="form-control" v-model="landscape.owner[form.edit_owner_code].name" @keyup.enter="editItemEnd('owner');">
                         </td>
-                        <td v-else v-on:click="editOwnerBegin(owner_code)">[[record.name]]</td>
+                        <td v-else v-on:click="editItemBegin('owner', owner_code)">[[record.name]]</td>
                         <td>
-                          <button class="btn btn-danger form-control" v-on:click="delOwner(owner_code)">&times;</button>
+                          <button class="btn btn-danger form-control" v-on:click="delItem('owner', owner_code)">&times;</button>
                         </td>
                       </tr>
                     </tbody>
@@ -144,13 +144,13 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.map_code" @keyup.enter="addMap">
+                          <input type="text" class="form-control" v-model="form.map_code" @keyup.enter="addItem('map')">
                         </td>
                         <td>
-                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addMap">
+                          <input type="text" class="form-control" v-model="form.name" @keyup.enter="addItem('map')">
                         </td>
                         <td>
-                          <button class="btn btn-success form-control" v-on:click="addMap">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="addItem('map')">&plus;</button>
                         </td>
                       </tr>
                     </thead>
@@ -158,13 +158,13 @@
                       <tr v-for="record, map_code in landscape.map">
                         <td>[[map_code]]</td>
                         <td v-if="form.edit_map_code == map_code">
-                          <input type="text" class="form-control" v-model="landscape.map[form.edit_map_code].name" @keyup.enter="editMapEnd();">
+                          <input type="text" class="form-control" v-model="landscape.map[form.edit_map_code].name" @keyup.enter="editItemEnd('map');">
                         </td>
-                        <td v-else v-on:click="editMapBegin(map_code)">[[record.name]]</td>
+                        <td v-else v-on:click="editItemBegin('map', map_code)">[[record.name]]</td>
                         <td>
                           <div class="btn-group" role="group" aria-label="Basic example">
                             <button class="btn btn-primary form-control" v-on:click="editMap(map_code)">&#128393;</button>
-                            <button class="btn btn-danger form-control" v-on:click="delMap(map_code)">&times;</button>
+                            <button class="btn btn-danger form-control" v-on:click="delItem('map', map_code)">&times;</button>
                           </div>
                         </td>
                       </tr>

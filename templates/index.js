@@ -30,89 +30,56 @@ var pbpmApp = new Vue(
     load: function() {
       jQuery.get('/landscape/get/', {}, function(data) { pbpmApp.landscape = data; }, 'json');
     },
-    addStation: function() {
-      this.landscape.station[this.form.station_code] = { 'name': this.form.name };
+    addItem: function(item) {
+      if (item == 'station') {
+        this.landscape.station[this.form.station_code] = { 'name': this.form.name };
+      } else if (item == 'service') {
+        this.landscape.service[this.form.service_code] = { 'url_template': this.form.url_template };
+      } else if (item == 'owner') {
+        this.landscape.owner[this.form.owner_code] = { 'name': this.form.name };
+      } else if (item == 'map') {
+        this.landscape.map[this.form.map_code] = { 'name': this.form.name };
+      }
       this.save();
       this.resetForm();
     },
-    editStationBegin: function(station_code) {
-      this.form.edit_station_code = station_code;
-      this.vueRender();
-    },
-    editStationEnd: function() {
-      delete this.form.edit_station_code;
-      this.vueRender();
-      this.save();
-    },
-    delStation: function(station_code) {
-      if (this.landscape.station[station_code] != undefined) {
-        delete this.landscape.station[station_code];
-        this.vueRender();
-        this.save();
+    editItemBegin(item, code) {
+      if (item == 'station') {
+        this.form.edit_station_code = code;
+      } else if (item == 'service') {
+        this.form.edit_service_code = code;
+      } else if (item == 'owner') {
+        this.form.edit_owner_code = code;
+      } else if (item == 'map') {
+        this.form.edit_map_code = code;
       }
-    },
-    addService: function() {
-      this.landscape.service[this.form.service_code] = { 'url_template': this.form.url_template };
-      this.save();
-      this.resetForm();
-    },
-    editServiceBegin: function(service_code) {
-      this.form.edit_service_code = service_code;
       this.vueRender();
     },
-    editServiceEnd: function() {
-      delete this.form.edit_service_code;
-      this.vueRender();
-      this.save();
-    },
-    delService: function(service_code) {
-      if (this.landscape.service[service_code] != undefined) {
-        delete this.landscape.service[service_code];
-        this.vueRender();
-        this.save();
+    editItemEnd(item) {
+      if (item == 'station') {
+        delete this.form.edit_station_code;
+      } else if (item == 'service') {
+        delete this.form.edit_service_code;
+      } else if (item == 'owner') {
+        delete this.form.edit_owner_code;
+      } else if (item == 'map') {
+        delete this.form.edit_map_code;
       }
-    },
-    addOwner: function() {
-      this.landscape.owner[this.form.owner_code] = { 'name': this.form.name };
-      this.save();
-      this.resetForm();
-    },
-    editOwnerBegin: function(owner_code) {
-      this.form.edit_owner_code = owner_code;
-      this.vueRender();
-    },
-    editOwnerEnd: function() {
-      delete this.form.edit_owner_code;
       this.vueRender();
       this.save();
     },
-    delOwner: function(owner_code) {
-      if (this.landscape.owner[owner_code] != undefined) {
-        delete this.landscape.owner[owner_code];
-        this.vueRender();
-        this.save();
+    delItem: function(item, code) {
+      if (item == 'station') {
+        delete this.landscape.station[code];
+      } else if (item == 'service') {
+        delete this.landscape.service[code];
+      } else if (item == 'owner') {
+        delete this.landscape.owner[code];
+      } else if (item == 'map') {
+        delete this.landscape.map[code];
       }
-    },
-    addMap: function() {
-      this.landscape.map[this.form.map_code] = { 'name': this.form.name };
-      this.save();
-      this.resetForm();
-    },
-    editMapBegin: function(map_code) {
-      this.form.edit_map_code = map_code;
-      this.vueRender();
-    },
-    editMapEnd: function() {
-      delete this.form.edit_map_code;
       this.vueRender();
       this.save();
-    },
-    delMap: function(map_code) {
-      if (this.landscape.map[map_code] != undefined) {
-        delete this.landscape.map[map_code];
-        this.vueRender();
-        this.save();
-      }
     },
     resetForm: function() {
       if (this.tab == 'stations') {
