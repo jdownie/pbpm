@@ -19,6 +19,12 @@ p = pbpm.pbpm(pbpm_config_path)
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
+@app.route('/get/status')
+@app.route('/get/status/<instance_id>')
+def get_status(instance_id = 5):
+  s = p.get()
+  return '/get/status({0}) {1}'.format(instance_id, s)
+
 # ### The user interface...
 
 @app.route('/favicon.ico')
