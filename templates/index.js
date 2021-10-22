@@ -18,6 +18,7 @@ var pbpmApp = new Vue(
                , 'owner': { 'label': 'Owners', 'fields': { 'name': 'Name' } }
                , 'map': { 'label': 'Maps', 'fields': { 'name': 'Name' } }
                }
+             , 'debug': false
              }
     }
   }
@@ -25,6 +26,9 @@ var pbpmApp = new Vue(
     this.selectTab('map');
     this.load();
     $('#pbpm').fadeIn();
+    window.addEventListener("dblclick", function(event) {
+      pbpmApp.cfg.debug = ! pbpmApp.cfg.debug;
+     }, false);
   }
 , methods: {
     vueRender: function() {
