@@ -31,14 +31,14 @@ var pbpmApp = new Vue(
   filters: {
     configStepLabel: function(landscape, record, map_code, i) {
       var type = record.type.toUpperCase();
-      var ret = ( i + 1 ) + ') ' + type + ':' + record.code;
+      var ret = ( i + 1 ) + '. ' + record.code;
       var label = '';
       if (type == 'STATION') {
         if ( landscape.station[record.code] != undefined) {
           label = ' - ' + landscape.station[record.code].name;
         }
       }
-      ret = ret + label;
+      ret = ret + label + ' (' + type + ')';
       return ret;
     }
   },

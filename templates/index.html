@@ -85,7 +85,7 @@
         <div class="row editMap" v-else-if="tab == 'editMap'">
           <h1>[[form.code]] - [[landscape.map[form.code].name]]</h1>
           <button class="btn btn-secondary form-control exitButton" v-on:click="selectTab('map')">Exit</button>
-          <div class="col-4">
+          <div class="col-6">
             <div class="input-group mb-1">
               <span class="input-group-text" id="basic-addon1">Add a Station</span>
               <select class="form-control" v-on:change="mapAddStation" v-model="form.add.station_code">
@@ -142,9 +142,7 @@
               </li>
             </ol>
           </div>
-          <div class="col-4">
-            <div id="diagram"></div>
-            <hr />
+          <div class="col-6">
             <div v-if="form.edit != null">
               <div class="row" v-if="landscape.map[form.code].config[form.edit[0]].code != 'END'">
                 <div class="input-group mb-1">
@@ -160,9 +158,8 @@
                 </div>
               </div>
             </div>
-            <pre>[[form]]</pre>
-          </div>
-          <div class="col-4">
+            <hr />
+            <div id="diagram"></div>
           </div>
         </div>
         <div class="row tables" v-else>

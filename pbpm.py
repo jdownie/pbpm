@@ -8,8 +8,10 @@ from datetime import datetime
 import os, json, enum, sys
 
 class pbpmFileEnum(enum.Enum):
-  landscape = 1
-  log = 2
+  landscape     = 1
+  log           = 2
+  active        = 3
+  complete      = 4
 
 class pbpm:
 
@@ -22,8 +24,10 @@ class pbpm:
 
   def __path(self, file_code):
     ret = None
-    ret = os.path.join(self.path, "landscape.json") if file_code == pbpmFileEnum.landscape else ret
-    ret = os.path.join(self.path, "{0}.log".format(datetime.now().strftime("%Y%m%d"))) if file_code == pbpmFileEnum.log else ret
+    ret = os.path.join(self.path, "landscape.json")                                    if file_code == pbpmFileEnum.landscape else ret
+    ret = os.path.join(self.path, "active")                                            if file_code == pbpmFileEnum.active    else ret
+    ret = os.path.join(self.path, "complete")                                          if file_code == pbpmFileEnum.complete  else ret
+    ret = os.path.join(self.path, "{0}.log".format(datetime.now().strftime("%Y%m%d"))) if file_code == pbpmFileEnum.log       else ret
     return ret
 
   def __mend(self):
@@ -68,10 +72,14 @@ class pbpm:
     Initialise a pbpm instance.
     :param path: The folder in which this pbpm should read and write it's process modelling work.
     """
-    assert path != None, "The pbpm class must be initialised referencing a folder in which it can maintain it's state."
-    assert os.path.exists(path), "The pbpm_config_path specified ({0}) does not exist.".format(path)
+    assert path != None,             "The pbpm class must be initialised referencing a folder in which it can maintain it's state."
+    assert os.path.exists(path),     "The pbpm_config_path specified ({0}) does not exist.".format(path)
     assert os.access(path, os.W_OK), "The pbpm_config_path specified ({0}) is not writable.".format(path)
     self.path = path
+    for d in [ pbpmFileEnum.active, pbpmFileEnum.complete ]:
+      dir_path = self.__path(d)
+      if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
     self.load()
 
   def load(self):

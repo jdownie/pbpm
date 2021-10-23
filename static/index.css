@@ -1,13 +1,18 @@
 #pbpm { display: none; }
 #diagram { width: 100%; }
-body { padding-top: 20px; }
+body { padding-top: 20px; background-color: lightgrey; }
 .tabbody {
   padding: 20px;
-  border-color: #ffffff #dee2e6 #dee2e6 #dee2e6;
+  /* border-color: #ffffff #dee2e6 #dee2e6 #dee2e6; */
+  border-color: grey;
   border-style: solid;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  background-color: #ffffff;
 }
+.nav-tabs .nav-item { background-color: #dddddd; }
+.nav-tabs .nav-item .nav-link { border-color: #cccccc; border-bottom: none; }
+.nav-tabs .nav-item .nav-link.active { font-weight: bold; color: black; border-color: grey; }
 .datagrid table.table td { font-size: 16pt; }
 .datagrid table.table th { font-size: 16pt; }
 .tabbody.datagrid table.table button.btn { font-size: 12pt; font-weight: bold; }
@@ -17,3 +22,4 @@ input[type="color"] { height: 38px; }
 .list-group.stationActions { width: 100%; }
 .editRouter .btn-success { height: 141px; }
 .editRouter .btn-danger { height: 65px; }
+.datagrid table.table { margin-bottom: 0px; }
