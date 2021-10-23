@@ -9,6 +9,7 @@ var pbpmApp = new Vue(
       'cfg': { 'table':
                { 'station': { 'label': 'Stations', 'fields': { 'name': 'Name' } }
                , 'service': { 'label': 'Services', 'fields': { 'url_template': 'URL Template' } }
+               , 'router': { 'label': 'Routers', 'fields': { 'description': 'Description' } }
                , 'owner': { 'label': 'Owners', 'fields': { 'name': 'Name' } }
                , 'map': { 'label': 'Maps', 'fields': { 'name': 'Name' } }
                }
@@ -74,19 +75,35 @@ var pbpmApp = new Vue(
         this.save();
       }
     },
+    mapAddRouter(e) {
+      if (this.form.add.router_code != '') {
+        var record = { 'type': 'router', 'code': this.form.add.router_code };
+        var srcActions = this.landscape.router[this.form.add.router_code].actions;
+        var dstActions = new Array();
+        for (var a in srcActions) {
+          var newAction = { 'code': srcActions[a].action_code, 'leads_to': null };
+          dstActions.push(newAction);
+        }
+        record.actions = dstActions;
+        this.landscape.map[this.form.code].config.push(record);
+        this.form.add.router_code = '';
+        this.save();
+      }
+    },
     mapSelect(config_id, action_id = undefined) {
       // First, check to see if we're selecting a station or not...
       var type = this.landscape.map[this.form.code].config[config_id].type;
       var code = this.landscape.map[this.form.code].config[config_id].code;
       console.log(config_id, type, code, action_id );
-      if (type == 'station' && action_id != undefined) {
-        console.log('Handling as a station and action selection.');
+      if ([ 'station', 'router' ].indexOf(type) != -1 && action_id != undefined) {
+        console.log('Handling as a station/router and action selection.');
         if (this.form.edit != null && this.form.edit.length == 2 && this.form.edit[0] == config_id && this.form.edit[1] == action_id) {
           this.form.edit = null;
           this.form.leads_to = '';
         } else {
           this.form.edit = [ config_id, action_id ];
-          var station_code = this.landscape.map[this.form.code].config[config_id].code;
+          var type = this.landscape.map[this.form.code].config[config_id].type;
+          var code = this.landscape.map[this.form.code].config[config_id].code;
           var action = this.landscape.map[this.form.code].config[config_id].actions[action_id];
           if (action.leads_to != undefined && action.leads_to != null) {
             this.form.leads_to = action.leads_to;
@@ -171,19 +188,40 @@ var pbpmApp = new Vue(
         this.form = { 'code': code, 'add': { 'action_code': '', 'label': '', 'color': '#198754' }, 'edit': null }
       }
     },
+    editRouter: function(code) {
+      if (this.landscape.router[code] != undefined) {
+        if (this.landscape.router[code].actions == undefined) {
+          this.landscape.station[code].actions = [];
+        }
+        this.selectTab('editRouter');
+        this.form = { 'code': code, 'add': { 'action_code': '', 'label': '', 'expression': '' }, 'edit': null }
+      }
+    },
     addStationAction() {
       var record = JSON.parse(JSON.stringify(this.form.add));
       this.landscape.station[this.form.code].actions.push(record);
       this.editStation(this.form.code);
       this.save();
     },
+    addRouterAction() {
+      var record = JSON.parse(JSON.stringify(this.form.add));
+      this.landscape.router[this.form.code].actions.push(record);
+      this.editRouter(this.form.code);
+      this.save();
+    },
     delStationAction(i) {
-      this.landscape.station[this.form.code].actions.pop(i);
+      console.log('dsa', i);
+      this.landscape.station[this.form.code].actions.splice(i, 1);
+      this.save();
+    },
+    delRouterAction(i) {
+      console.log('dra', i);
+      this.landscape.router[this.form.code].actions.splice(i, 1);
       this.save();
     },
     editMap: function(code) {
       this.selectTab('editMap');
-      this.form = { 'code': code, 'add': { 'station_code': '' }, 'edit': null, 'leads_to': '' };
+      this.form = { 'code': code, 'add': { 'station_code': '', 'service_code': '', 'router_code': '' }, 'edit': null, 'leads_to': '' };
     },
     resetForm: function() {
       var map = this.cfg.table;
@@ -203,6 +241,10 @@ var pbpmApp = new Vue(
     selectTab: function(tab) {
       this.tab = tab;
       this.resetForm();
+    },
+    delMapConfigItem: function(i) {
+      this.landscape.map[this.form.code].config.splice(i, 1);
+      this.save();
     }
   }
 });

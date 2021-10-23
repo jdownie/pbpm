@@ -27,6 +27,12 @@ class pbpm:
     return ret
 
   def __mend(self):
+    # Make sure that the landscaps contains the essential root dictionaries.
+    ds = [ "map", "station", "service", "owner", "router" ]
+    for d in ds:
+      if not d in self.landscape.keys():
+        self.landscape[d] = dict()
+    # Clean up maps...
     for map_code in self.landscape["map"]:
       if not "config" in self.landscape["map"][map_code].keys():
         self.landscape["map"][map_code]["config"] = list()
@@ -41,9 +47,14 @@ class pbpm:
           print(station_code, file=sys.stderr)
           print(json.dumps(self.landscape["map"][map_code]), file=sys.stderr)
           self.landscape["map"][map_code]["config"].append(node)
+    # Clean up stations...
     for station_code in self.landscape["station"].keys():
       if not "actions" in self.landscape["station"][station_code].keys():
         self.landscape["station"][station_code]["actions"] = list()
+    # Clean up routers...
+    for router_code in self.landscape["router"].keys():
+      if not "actions" in self.landscape["router"][router_code].keys():
+        self.landscape["router"][router_code]["actions"] = list()
 
   def __log(self, entry):
     dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -75,10 +86,8 @@ class pbpm:
       self.landscape = json.load(fin)
       fin.close()
     else:
-      ds = [ "map", "station", "service", "owner" ]
-      for d in ds:
-        self.landscape[d] = dict()
-      print("Loaded configuration from {0}".format(self.path))
+      self.landscape = dict()
+    print("Loaded configuration from {0}".format(self.path))
     self.__mend()
     return self
 

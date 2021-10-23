@@ -15,3 +15,5 @@ body { padding-top: 20px; }
 button.btn.exitButton { position: absolute; width: 77px; top: 30px; right: 30px; }
 input[type="color"] { height: 38px; }
 .list-group.stationActions { width: 100%; }
+.editRouter .btn-success { height: 141px; }
+.editRouter .btn-danger { height: 65px; }

@@ -38,11 +38,25 @@
           "actions": [
             {
               "code": "COMPLETE",
-              "leads_to": 1
+              "leads_to": 6
             },
             {
               "code": "REJECT",
               "leads_to": 2
+            }
+          ]
+        },
+        {
+          "type": "router",
+          "code": "RANDOM",
+          "actions": [
+            {
+              "code": "T1",
+              "leads_to": 2
+            },
+            {
+              "code": "T2",
+              "leads_to": 1
             }
           ]
         }
@@ -105,6 +119,25 @@
     },
     "george.harrison": {
       "name": "George Harrison"
+    }
+  },
+  "router": {
+    "RANDOM": {
+      "description": "Random Number Router",
+      "actions": [
+        {
+          "action_code": "T1",
+          "label": "",
+          "expression": "1 == 0",
+          "description": "Deliberately False"
+        },
+        {
+          "action_code": "T2",
+          "label": "",
+          "expression": "1 == 1",
+          "description": "Deliberately True"
+        }
+      ]
     }
   }
 }
