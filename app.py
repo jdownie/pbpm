@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: iso-8859-15 -*-
 
-import os, pbpm, sys, json, random
+import os, pbpm, sys, json, random, html
 from flask import Flask, render_template, send_from_directory, request
 
 # Establish the pbpm instance that this service will work with...
@@ -68,4 +68,12 @@ def testRandom():
   ret = dict()
   random.seed()
   ret["r"] = random.randrange(1, 4)
+  return ret
+
+@app.route('/instance/create/', methods = [ 'POST' ])
+def instanceCreate():
+  map_code = request.form['map_code']
+  vars = json.loads(request.form['vars'])
+  ret = dict()
+  ret["id"] = p.createInstance(map_code, vars)
   return ret

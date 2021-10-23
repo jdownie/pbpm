@@ -10,7 +10,7 @@ body { padding-top: 20px; background-color: lightgrey; }
   border-bottom-right-radius: 5px;
   background-color: #ffffff;
 }
-.nav-tabs .nav-item { background-color: #dddddd; }
+.nav-tabs .nav-item { background-color: #dddddd; margin-right: 3px; }
 .nav-tabs .nav-item .nav-link { border-color: #cccccc; border-bottom: none; }
 .nav-tabs .nav-item .nav-link.active { font-weight: bold; color: black; border-color: grey; }
 .datagrid table.table td { font-size: 16pt; }

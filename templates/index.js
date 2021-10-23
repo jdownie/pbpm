@@ -21,7 +21,7 @@ var pbpmApp = new Vue(
     this.load();
     $('#pbpm').fadeIn();
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
-    this.selectTab('map');
+    this.selectTab('create');
     /*
     window.setTimeout(function() {
       pbpmApp.editMap('AUC');
@@ -232,6 +232,12 @@ var pbpmApp = new Vue(
         }
         this.form = record;
         this.vueRender();
+      } else if (this.tab == 'create') {
+        var vars = [];
+        vars.push({ 'var': 'intVar', 'val': -7 });
+        vars.push({ 'var': 'charVar', 'val': 'AAA' });
+        vars.push({ 'var': 'floatVar', 'val': 7.3 });
+        this.form = { 'vars': vars, 'map_code': '' };
       } else {
         this.form = null;
       }
@@ -243,6 +249,11 @@ var pbpmApp = new Vue(
     delMapConfigItem: function(i) {
       this.landscape.map[this.form.code].config.splice(i, 1);
       this.save();
+    },
+    createSubmit: function(e) {
+      jQuery.post('/instance/create/', { 'map_code': this.form.map_code, 'vars': JSON.stringify(this.form.vars) }, function(data) {
+        console.log(data);
+      });
     }
   }
 });

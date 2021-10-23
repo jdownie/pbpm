@@ -5,7 +5,7 @@ Python Business Process Modelling Class Definitions
 """
 
 from datetime import datetime
-import os, json, enum, sys
+import os, json, enum, sys, uuid
 
 class pbpmFileEnum(enum.Enum):
   landscape     = 1
@@ -22,8 +22,8 @@ class pbpm:
   path = None
   landscape = dict()
 
-  def __path(self, file_code):
-    ret = None
+  def __path(self, file_code = None):
+    ret = self.path
     ret = os.path.join(self.path, "landscape.json")                                    if file_code == pbpmFileEnum.landscape else ret
     ret = os.path.join(self.path, "active")                                            if file_code == pbpmFileEnum.active    else ret
     ret = os.path.join(self.path, "complete")                                          if file_code == pbpmFileEnum.complete  else ret
@@ -112,6 +112,17 @@ class pbpm:
     fout.close()
     print("Saved configuration to {0}".format(self.path))
     return None
+
+  def createInstance(self, map_code, vars):
+    id = uuid.uuid4()
+    content = dict()
+    content["map_code"] = map_code
+    content["vars"] = vars
+    dest = os.path.join(self.__path(pbpmFileEnum.active), "{0}.json".format(id))
+    fout = open(dest, "w")
+    json.dump(content, fout)
+    fout.close()
+    return id
 
   def get(self):
     return self.path

@@ -171,6 +171,9 @@
               <li class="nav-item" v-for="record, t in cfg.table" v-on:click="selectTab(t)">
                 <a class="nav-link" :class="{ 'active': tab == t }" aria-current="page" href="#">[[record.label]]</a>
               </li>
+              <li class="nav-item" v-on:click="selectTab('create')">
+                <a class="nav-link" :class="{ 'active': tab == 'create' }" aria-current="page" href="#">Create</a>
+              </li>
             </ul>
             <div class="tabbody" v-if="tab == 'welcome'">
               <h1>Welcome</h1>
@@ -212,6 +215,35 @@
                   </table>
                 </div>
               </div>
+            </div>
+            <div class="tabbody" v-if="tab == 'create'">
+              <h1>Create</h1>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th><button class="btn btn-primary form-control" v-on:click="form.vars.push({ 'var': '', 'val': '' })">Add Variable</button></th>
+                    <th colspan="2">
+                      <div class="input-group">
+                        <select class="form-control" v-model="form.map_code">
+                          <option v-for="map, map_code in landscape.map" :value="map_code">[[map_code]] - [[map.name]]</option>
+                        </select>
+                        <button class="btn btn-success" type="button" :disabled="form.map_code == ''" v-on:click="createSubmit">Create Instance</button>
+                      </div>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>var</th>
+                    <th>val</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="v, i in form.vars">
+                    <td><input type="text" class="form-control" v-model="v.var"></td>
+                    <td><input type="text" class="form-control" v-model="v.val"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <pre>[[form]]</pre>
             </div>
           </div>
         </div>
