@@ -20,10 +20,12 @@ var pbpmApp = new Vue(
     this.load();
     $('#pbpm').fadeIn();
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
-    //this.selectTab('map');
+    this.selectTab('map');
+    /*
     window.setTimeout(function() {
       pbpmApp.editMap('AUC');
     }, 500);
+    */
   }
 , filters: {
   configStepLabel: function(landscape, record, map_code, i) {
@@ -111,6 +113,7 @@ var pbpmApp = new Vue(
       this.save();
     },
     delItem: function(item, code) {
+      console.log(item, code);
       delete this.landscape[item][code];
       this.vueRender();
       this.save();
@@ -128,6 +131,26 @@ var pbpmApp = new Vue(
       cfg[src].leads_to = dst;
       delete this.form.leads_to;
       this.form.edit = null;
+      this.save();
+    },
+    editStation: function(code) {
+      if (this.landscape.station[code] != undefined) {
+        if (this.landscape.station[code].actions == undefined) {
+          this.landscape.station[code].actions = [];
+        }
+        this.selectTab('editStation');
+        this.form = { 'code': code, 'add': { 'action_code': '', 'label': '', 'color': '#198754' }, 'edit': null }
+      }
+    },
+    addStationAction() {
+      var record = JSON.parse(JSON.stringify(this.form.add));
+      this.landscape.station[this.form.code].actions.push(record);
+      this.editStation(this.form.code);
+      this.save();
+    },
+    delStationAction(i) {
+      console.log(i);
+      this.landscape.station[this.form.code].actions.pop(i);
       this.save();
     },
     editMap: function(code) {

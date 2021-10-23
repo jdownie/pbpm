@@ -6,7 +6,7 @@
         {
           "type": "station",
           "code": "BEGIN",
-          "leads_to": 2
+          "leads_to": 5
         },
         {
           "type": "station",
@@ -16,6 +16,23 @@
           "type": "station",
           "code": "PREPRESS",
           "leads_to": 1
+        },
+        {
+          "type": "station",
+          "code": "WCINSPECT"
+        },
+        {
+          "type": "station",
+          "code": "QA"
+        },
+        {
+          "type": "service",
+          "code": "GENERAL",
+          "leads_to": 2
+        },
+        {
+          "type": "service",
+          "code": "RANDOM"
         }
       ]
     },
@@ -99,13 +116,75 @@
   },
   "station": {
     "PREPRESS": {
-      "name": "Prepress"
+      "name": "Prepress",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete Prepress",
+          "color": "#198754",
+          "code": "COMPLETE"
+        }
+      ]
     },
     "QA": {
-      "name": "Quality Check"
+      "name": "Quality Check",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete QA",
+          "color": "#198754",
+          "code": "COMPLETE"
+        },
+        {
+          "action_code": "",
+          "label": "Reject to Prepress",
+          "color": "#198754",
+          "code": "REJECT"
+        }
+      ]
     },
     "WCINSPECT": {
-      "name": "Web Center Inspection"
+      "name": "Web Center Inspection",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Re-run WC Inspect Workflow",
+          "color": "#195686",
+          "code": "RERUN"
+        },
+        {
+          "action_code": "",
+          "label": "Release from Web Center",
+          "color": "#198754",
+          "code": "RELEASE"
+        },
+        {
+          "action_code": "",
+          "label": "Abandon Web Center Inspection",
+          "color": "#ff9b0f",
+          "code": "ABANDON"
+        }
+      ]
+    },
+    "a": {
+      "name": "A"
+    },
+    "c": {
+      "name": "C",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Y",
+          "color": "#198754",
+          "code": "y"
+        },
+        {
+          "action_code": "",
+          "label": "N",
+          "color": "#c51b1b",
+          "code": "n"
+        }
+      ]
     }
   },
   "service": {

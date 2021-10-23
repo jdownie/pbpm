@@ -8,10 +8,45 @@
   <body>
     <div id="pbpm">
       <div class="container-fluid" v-if="landscape != null">
-        <div class="row" v-if="tab == 'editMap'">
+        <div class="row" v-if="tab == 'editStation'">
+          <h1>[[form.code]] - [[landscape.station[form.code].name]]</h1>
+          <button class="btn btn-secondary exitButton" v-on:click="selectTab('station')">Exit</button>
+          <div class="col">
+            <table class="table">
+              <thead>
+                <tr>
+                  <td>
+                    <input type="text" class="form-control" v-model="form.add.code" placeholder="Code" @keyup.enter="addStationAction()">
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" v-model="form.add.label" placeholder="Label" @keyup.enter="addStationAction()">
+                  </td>
+                  <td>
+                    <input type="color" class="form-control" v-model="form.add.color">
+                  </td>
+                  <td>
+                    <button class="btn btn-success form-control" v-on:click="addStationAction()">&plus;</button>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="record, i in landscape.station[form.code].actions">
+                  <td v-bind:style="{ 'background-color': record.color }"></td>
+                  <td>[[record.code]]</td>
+                  <td>[[record.label]]</td>
+                  <td>
+                    <button class="btn btn-danger form-control" v-on:click="delStationAction(i)">&times;</button>
+                  </tr>
+                </tr>
+              </tbody>
+            </table>
+            <pre>[[landscape.station[form.code].actions]]</pre>
+          </div>
+        </div>
+        <div class="row" v-else-if="tab == 'editMap'">
           <h1>[[form.code]] - [[landscape.map[form.code].name]]</h1>
+          <button class="btn btn-secondary form-control exitButton" v-on:click="selectTab('map')">Exit</button>
           <div class="col-4">
-            <button class="btn btn-secondary form-control mb-1" v-on:click="selectTab('map')">Exit</button>
             <div class="input-group mb-1">
               <span class="input-group-text" id="basic-addon1">Add a Station</span>
               <select class="form-control" v-on:change="mapAddStation" v-model="form.add.station_code">
@@ -31,6 +66,15 @@
                 <div class="ms-2 me-auto">
                   <div class="fw-bold">[[node.code]]</div>
                   <span v-if="landscape.station[node.code] != undefined">[[landscape.station[node.code].name]]</span>
+                  <div class="list-group stationActions" v-if="landscape.station[node.code] != undefined && landscape.station[node.code].actions != undefined">
+                    <button v-for="action, a in landscape.station[node.code].actions" type="button" class="list-group-item list-group-item-action">[[action.code]] - [[action.label]]
+                      <span class="badge rounded-pill" style="margin-left: 16px;" v-bind:style="{ 'background-color': action.color }">&nbsp;&nbsp;&nbsp;</span>
+
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                      The current button
+                    </button>
+                  </div>
                 </div>
                 <span class="badge bg-primary rounded-pill" v-if="node.type == 'station'">Station</span>
                 <span class="badge bg-success rounded-pill" v-if="node.type == 'service'">Service</span>
@@ -96,7 +140,8 @@
                         <td>
                           <div class="btn-group" role="group" aria-label="Basic example">
                             <button class="btn btn-primary form-control" v-if="tab == 'map'" v-on:click="editMap(code)">&#128393;</button>
-                            <button class="btn btn-danger form-control" v-on:click="delItem('map', code)">&times;</button>
+                            <button class="btn btn-primary form-control" v-if="tab == 'station'" v-on:click="editStation(code)">&#128393;</button>
+                            <button class="btn btn-danger form-control" v-on:click="delItem(tab, code)">&times;</button>
                           </div>
                         </td>
                       </tr>
@@ -113,9 +158,6 @@
           </div>
           <div class="col">
             <pre>[[form]]</pre>
-          </div>
-          <div class="col">
-            <pre>[[landscape.map[form.code].config]]</pre>
           </div>
         </div>
       </div>
