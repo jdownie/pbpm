@@ -5,6 +5,7 @@ var pbpmApp = new Vue(
     return {
       'tab': null,
       'form': null,
+      'svc': null,
       'landscape': null,
       'cfg': { 'table':
                { 'station': { 'label': 'Stations', 'fields': { 'name': 'Name' } },
@@ -18,15 +19,13 @@ var pbpmApp = new Vue(
     };
   },
   mounted: function() {
-    this.load();
+    this.svc = pbpm;
+    this.svc.load();
+    // bind this application's landscape to svc's...
+    this.landscape = this.svc.landscape;
     $('#pbpm').fadeIn();
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
-    this.selectTab('create');
-    /*
-    window.setTimeout(function() {
-      pbpmApp.editMap('AUC');
-    }, 500);
-    */
+    this.selectTab('station');
   },
   filters: {
     configStepLabel: function(landscape, record, map_code, i) {
@@ -136,9 +135,6 @@ var pbpmApp = new Vue(
     },
     save: function() {
       jQuery.post('/landscape/put/', JSON.stringify(this.landscape), function(data) { pbpmApp.landscape = data; }, 'json');
-    },
-    load: function() {
-      jQuery.get('/landscape/get/', {}, function(data) { pbpmApp.landscape = data; }, 'json');
     },
     addItem: function(item) {
       var map = this.cfg.table;

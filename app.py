@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-15 -*-
 
 import os, pbpm, sys, json, random, html
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, current_app
 
 # Establish the pbpm instance that this service will work with...
 
@@ -29,17 +29,18 @@ def get_status(instance_id = 5):
 
 @app.route('/favicon.ico')
 def favicon():
-  return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+  return current_app.send_static_file("favicon.ico")
+
+@app.route('/js/<page>')
+@app.route('/css/<page>')
+def cssFile(page):
+  return current_app.send_static_file(page)
 
 @app.route('/ui/')
 @app.route('/ui/<page>')
 def ui(page = None):
-  ret = ""
   page = "index.html" if page == None else page
-  if page in [ "index.css" ]:
-    ret = send_from_directory(os.path.join(app.root_path, 'static'), 'index.css', mimetype='text/css')
-  else:
-    ret = render_template(page)
+  ret = render_template(page)
   return ret
 
 # ### Methods for loading and saving the landscape...
