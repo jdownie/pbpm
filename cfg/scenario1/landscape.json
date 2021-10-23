@@ -1,72 +1,26 @@
 {
   "map": {
     "ND": {
-      "name": "New Designs",
+      "name": "New Design",
       "config": [
         {
           "type": "station",
           "code": "BEGIN",
-          "leads_to": 5
-        },
-        {
-          "type": "station",
-          "code": "END"
-        },
-        {
-          "type": "station",
-          "code": "PREPRESS",
-          "leads_to": 1
-        },
-        {
-          "type": "station",
-          "code": "WCINSPECT"
-        },
-        {
-          "type": "station",
-          "code": "QA"
-        },
-        {
-          "type": "service",
-          "code": "GENERAL",
-          "leads_to": 2
-        },
-        {
-          "type": "service",
-          "code": "RANDOM"
-        }
-      ]
-    },
-    "AUC": {
-      "name": "Author's Correction",
-      "config": [
-        {
-          "type": "station",
-          "code": "BEGIN",
-          "leads_to": 6
-        },
-        {
-          "type": "station",
-          "code": "END"
-        },
-        {
-          "type": "station",
-          "code": "PREPRESS",
           "leads_to": 3
         },
         {
           "type": "station",
-          "code": "QA",
-          "leads_to": 4
+          "code": "END"
         },
         {
           "type": "station",
-          "code": "WCINSPECT",
-          "leads_to": 5
-        },
-        {
-          "type": "station",
-          "code": "QA",
-          "leads_to": 1
+          "code": "PREPRESS",
+          "actions": [
+            {
+              "code": "COMPLETE",
+              "leads_to": 4
+            }
+          ]
         },
         {
           "type": "service",
@@ -75,41 +29,22 @@
         },
         {
           "type": "service",
-          "code": "RANDOM"
-        },
-        {
-          "type": "service",
-          "code": "GENERAL"
-        }
-      ]
-    },
-    "ALT": {
-      "name": "Alteration",
-      "config": [
-        {
-          "type": "station",
-          "code": "BEGIN"
+          "code": "RANDOM",
+          "leads_to": 5
         },
         {
           "type": "station",
-          "code": "END"
-        }
-      ]
-    },
-    "aaa": {
-      "name": "AAA",
-      "config": [
-        {
-          "type": "station",
-          "code": "BEGIN"
-        },
-        {
-          "type": "station",
-          "code": "END"
-        },
-        {
-          "type": "station",
-          "code": "PREPRESS"
+          "code": "QA",
+          "actions": [
+            {
+              "code": "COMPLETE",
+              "leads_to": 1
+            },
+            {
+              "code": "REJECT",
+              "leads_to": 2
+            }
+          ]
         }
       ]
     }
@@ -138,51 +73,8 @@
         {
           "action_code": "",
           "label": "Reject to Prepress",
-          "color": "#198754",
+          "color": "#bd0f0f",
           "code": "REJECT"
-        }
-      ]
-    },
-    "WCINSPECT": {
-      "name": "Web Center Inspection",
-      "actions": [
-        {
-          "action_code": "",
-          "label": "Re-run WC Inspect Workflow",
-          "color": "#195686",
-          "code": "RERUN"
-        },
-        {
-          "action_code": "",
-          "label": "Release from Web Center",
-          "color": "#198754",
-          "code": "RELEASE"
-        },
-        {
-          "action_code": "",
-          "label": "Abandon Web Center Inspection",
-          "color": "#ff9b0f",
-          "code": "ABANDON"
-        }
-      ]
-    },
-    "a": {
-      "name": "A"
-    },
-    "c": {
-      "name": "C",
-      "actions": [
-        {
-          "action_code": "",
-          "label": "Y",
-          "color": "#198754",
-          "code": "y"
-        },
-        {
-          "action_code": "",
-          "label": "N",
-          "color": "#c51b1b",
-          "code": "n"
         }
       ]
     }

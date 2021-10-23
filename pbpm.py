@@ -41,6 +41,9 @@ class pbpm:
           print(station_code, file=sys.stderr)
           print(json.dumps(self.landscape["map"][map_code]), file=sys.stderr)
           self.landscape["map"][map_code]["config"].append(node)
+    for station_code in self.landscape["station"].keys():
+      if not "actions" in self.landscape["station"][station_code].keys():
+        self.landscape["station"][station_code]["actions"] = list()
 
   def __log(self, entry):
     dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -76,6 +79,7 @@ class pbpm:
       for d in ds:
         self.landscape[d] = dict()
       print("Loaded configuration from {0}".format(self.path))
+    self.__mend()
     return self
 
   def save(self):

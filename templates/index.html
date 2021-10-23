@@ -11,7 +11,7 @@
         <div class="row" v-if="tab == 'editStation'">
           <h1>[[form.code]] - [[landscape.station[form.code].name]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('station')">Exit</button>
-          <div class="col">
+          <div class="col datagrid">
             <table class="table">
               <thead>
                 <tr>
@@ -62,17 +62,21 @@
               </select>
             </div>
             <ol class="list-group list-group-numbered">
-              <li class="list-group-item d-flex justify-content-between align-items-start" :class="{ 'active': form.edit == i }" v-for="node, i in landscape.map[form.code].config" v-on:click="mapSelect(i)">
+              <li class="list-group-item d-flex justify-content-between align-items-start"
+                 :class="{ 'active': form.edit != null && form.edit.length == 1 && form.edit[0] == i }"
+                  v-for="node, i in landscape.map[form.code].config"
+                  v-on:click="mapSelect(i)">
                 <div class="ms-2 me-auto">
                   <div class="fw-bold">[[node.code]]</div>
                   <span v-if="landscape.station[node.code] != undefined">[[landscape.station[node.code].name]]</span>
                   <div class="list-group stationActions" v-if="landscape.station[node.code] != undefined && landscape.station[node.code].actions != undefined">
-                    <button v-for="action, a in landscape.station[node.code].actions" type="button" class="list-group-item list-group-item-action">[[action.code]] - [[action.label]]
-                      <span class="badge rounded-pill" style="margin-left: 16px;" v-bind:style="{ 'background-color': action.color }">&nbsp;&nbsp;&nbsp;</span>
-
-                    </button>
-                    <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
-                      The current button
+                    <button v-for="action, a in node.actions"
+                            type="button"
+                            class="list-group-item list-group-item-action"
+                           :class="{ 'active': form.edit != null && form.edit.length == 2 && form.edit[0] == i && form.edit[1] == a }"
+                            v-on:click.stop="mapSelect(i, a)">
+                      <span class="badge rounded-pill" style="margin-right: 8px;" v-bind:style="{ 'background-color': landscape.station[node.code].actions[a].color }">&nbsp;&nbsp;&nbsp;</span>
+                      [[action.code]] - [[landscape.station[node.code].actions[a].label]] ([[i]], [[a]])
                     </button>
                   </div>
                 </div>
@@ -85,13 +89,14 @@
             <div id="diagram"></div>
             <hr />
             <div v-if="form.edit != null">
-              <div class="row" v-if="landscape.map[form.code].config[form.edit].code != 'END'">
+              <div class="row" v-if="landscape.map[form.code].config[form.edit[0]].code != 'END'">
                 <div class="input-group mb-1">
                   <span class="input-group-text" id="basic-addon1">Leads to...</span>
                   <select class="form-control" v-model="form.leads_to" v-on:change="linkMap">
                     <option></option>
-                    <option v-for="record, i in landscape.map[form.code].config" :value="i" v-if="i != form.edit">[[ landscape | configStepLabel(record, form.code, i) ]]</option>
+                    <option v-for="record, i in landscape.map[form.code].config" :value="i" v-if="i != form.edit[0]">[[ landscape | configStepLabel(record, form.code, i) ]]</option>
                   </select>
+                  <button v-if="form.leads_to != '' && landscape.map[form.code].config[form.leads_to].type != 'station'" class="btn btn-outline-secondary" type="button" v-on:click="mapSelect(form.leads_to)">🡆</button>
                 </div>
               </div>
             </div>
@@ -154,10 +159,18 @@
         </div>
         <div class="row" v-if="cfg.debug">
           <div class="col">
-            <pre>[[landscape]]</pre>
+            <h3>Stations</h3>
+            <pre>[[landscape.station]]</pre>
           </div>
           <div class="col">
+            <h3>Services</h3>
+            <pre>[[landscape.service]]</pre>
+            <h3>Form</h3>
             <pre>[[form]]</pre>
+          </div>
+          <div class="col">
+            <h3>Maps</h3>
+            <pre>[[landscape.map]]</pre>
           </div>
         </div>
       </div>

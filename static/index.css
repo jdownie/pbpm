@@ -8,12 +8,8 @@ body { padding-top: 20px; }
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-.tabbody.datagrid table.table td { font-size: 18pt; }
-.tabbody.datagrid table.table th { font-size: 18pt; }
-/*
-.tabbody.datagrid table.table thead>tr>th:first-child { width: 20%; }
-.tabbody.datagrid table.table thead>tr>th:last-child { width: 20px; }
-*/
+.datagrid table.table td { font-size: 16pt; }
+.datagrid table.table th { font-size: 16pt; }
 .tabbody.datagrid table.table button.btn { font-size: 12pt; font-weight: bold; }
 .tabbody.datagrid table.table .btn-group { width: 100%; }
 button.btn.exitButton { position: absolute; width: 77px; top: 30px; right: 30px; }
