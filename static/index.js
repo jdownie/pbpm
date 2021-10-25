@@ -13,12 +13,16 @@ var pbpmApp = new Vue(
   mounted: function() {
     pbpm.load(function() {
       pbpmApp.svc = pbpm;
-      pbpmApp.selectTab('graphviz');
+      pbpmApp.selectTab('instances');
       $('#pbpm').fadeIn();
     });
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
   },
   filters: {
+    datetimeFormat: function(utc) {
+      var ret = moment(utc).format('D MMM, H:mm:sa');
+      return ret;
+    },
     configStepLabel: function(landscape, record, map_code, i) {
       var type = record.type.toUpperCase();
       var ret = ( i + 1 ) + '. ' + record.code;
@@ -224,7 +228,10 @@ var pbpmApp = new Vue(
         vars.push({ 'var': 'intVar', 'val': -7 });
         vars.push({ 'var': 'charVar', 'val': 'AAA' });
         vars.push({ 'var': 'floatVar', 'val': 7.3 });
-        this.form = { 'vars': vars, 'map_code': '' };
+        this.form = { 'vars': vars, 'map_code': 'ND', 'owner_code': 'ringo.starr' };
+      } else if (this.tab == 'instances') {
+        this.form = { 'id': null, 'instance': null, 'progressLog': [] };
+        this.svc.instances.active.load();
       } else if (this.tab == 'graphviz') {
         this.form = { 'code': Object.keys(this.svc.landscape.map)[0] };
       } else {
@@ -240,8 +247,29 @@ var pbpmApp = new Vue(
       this.svc.save();
     },
     createSubmit: function(e) {
-      jQuery.post('/instance/create/', { 'map_code': this.form.map_code, 'vars': JSON.stringify(this.form.vars) }, function(data) {
+      var vars = {}
+      for (var i in this.form.vars) {
+        vars[this.form.vars[i].var] = this.form.vars[i].val;
+      }
+      jQuery.post('/instance/create/', { 'map_code': this.form.map_code, 'owner_code': this.form.owner_code, 'vars': JSON.stringify(vars) }, function(data) {
         console.log(data);
+      });
+    },
+    loadInstance: function(id) {
+      var app = this;
+      jQuery.get('/instance/' + id, {}, function(data) {
+        app.form.instance = data;
+      });
+    },
+    progressInstance: function(action_code = null, owner_code = null) {
+      var url = '/instance/progress/' + this.form.id;
+      if (action_code != null && owner_code != null) {
+        url = url + '/' + action_code + '/' + owner_code;
+      }
+      jQuery.get(url, {}, function(data) {
+        var j = JSON.parse(data);
+        pbpmApp.form.progressLog = j;
+        pbpmApp.loadInstance(pbpmApp.form.id);
       });
     }
   }

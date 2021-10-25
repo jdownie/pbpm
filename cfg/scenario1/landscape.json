@@ -105,6 +105,87 @@
           ]
         }
       ]
+    },
+    "RANDOM": {
+      "name": "Random",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 2
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "WAIT",
+          "actions": [
+            {
+              "code": "COMPLETE",
+              "leads_to": 1
+            },
+            {
+              "code": "RANDOM",
+              "leads_to": 7
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "A",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 2
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "B",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 2
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "C",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 2
+            }
+          ]
+        },
+        {
+          "type": "router",
+          "code": "RANDOM",
+          "actions": [
+            {
+              "code": "1",
+              "leads_to": 3
+            },
+            {
+              "code": "2",
+              "leads_to": 4
+            },
+            {
+              "code": "3",
+              "leads_to": 5
+            }
+          ]
+        },
+        {
+          "type": "service",
+          "code": "RANDOM",
+          "leads_to": 6
+        }
+      ]
     }
   },
   "station": {
@@ -141,9 +222,9 @@
       "actions": [
         {
           "action_code": "",
-          "label": "Go",
+          "label": "Loop",
           "color": "#198754",
-          "code": "GO"
+          "code": "LOOP"
         }
       ]
     },
@@ -152,9 +233,9 @@
       "actions": [
         {
           "action_code": "",
-          "label": "Go",
+          "label": "Loop",
           "color": "#198754",
-          "code": "GO"
+          "code": "LOOP"
         }
       ]
     },
@@ -163,16 +244,33 @@
       "actions": [
         {
           "action_code": "",
-          "label": "Go",
+          "label": "Loop",
           "color": "#198754",
-          "code": "GO"
+          "code": "LOOP"
+        }
+      ]
+    },
+    "WAIT": {
+      "name": "Wait",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete",
+          "color": "#198754",
+          "code": "COMPLETE"
+        },
+        {
+          "action_code": "",
+          "label": "Random",
+          "color": "#ff2ed2",
+          "code": "RANDOM"
         }
       ]
     }
   },
   "service": {
     "GENERAL": {
-      "url_template": "http://localhost:5000/test/general/?x=2&y=3"
+      "url_template": "http://localhost:5000/test/general/?charVar={charVar}&intVar={intVar}"
     },
     "RANDOM": {
       "url_template": "http://localhost:5000/test/random/"
@@ -188,14 +286,14 @@
     "payl.mccartney": {
       "name": "Paul McCartney"
     },
-    "ginro.starr": {
-      "name": "Ringo Starr"
-    },
     "john.lennon": {
       "name": "John Lennon"
     },
     "george.harrison": {
       "name": "George Harrison"
+    },
+    "ringo.starr": {
+      "name": "Ringo Starr"
     }
   },
   "router": {
@@ -203,16 +301,20 @@
       "description": "Random Number Router",
       "actions": [
         {
-          "action_code": "T1",
+          "action_code": "1",
           "label": "",
-          "expression": "1 == 0",
-          "description": "Deliberately False"
+          "expression": "vars.r == 1",
+          "description": ""
         },
         {
-          "action_code": "T2",
+          "action_code": "2",
           "label": "",
-          "expression": "1 == 1",
-          "description": "Deliberately True"
+          "expression": "vars.r == 2"
+        },
+        {
+          "action_code": "3",
+          "label": "",
+          "expression": "vars.r == 3"
         }
       ]
     }

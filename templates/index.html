@@ -68,7 +68,7 @@
                   </td>
                 </tr>
               </thead>
-              <tbody>
+              <tbody v-if="svc.landscape.station[form.code].actions != undefined">
                 <tr v-for="record, i in svc.landscape.station[form.code].actions">
                   <td v-bind:style="{ 'background-color': record.color }"></td>
                   <td>[[record.code]]</td>
@@ -79,7 +79,6 @@
                 </tr>
               </tbody>
             </table>
-            <pre>[[svc.landscape.station[form.code].actions]]</pre>
           </div>
         </div>
         <div class="row editMap" v-else-if="tab == 'editMap'">
@@ -177,6 +176,9 @@
               <li class="nav-item" v-on:click="selectTab('create')">
                 <a class="nav-link" :class="{ 'active': tab == 'create' }" aria-current="page" href="#">Create</a>
               </li>
+              <li class="nav-item" v-on:click="selectTab('instances')">
+                <a class="nav-link" :class="{ 'active': tab == 'instances' }" aria-current="page" href="#">Instances</a>
+              </li>
             </ul>
             <div class="tabbody" v-if="tab == 'welcome'">
               <h1>Welcome</h1>
@@ -234,21 +236,129 @@
                 </div>
               </div>
             </div>
-            <div class="tabbody" v-if="tab == 'create'">
-              <h1>Create</h1>
+            <div class="tabbody instances" v-if="tab == 'instances'">
+              <div v-if="form.id == null">
+                <h1>[[ Object.keys(svc.activeInstances).length ]] Active Instances</h1>
+                <hr />
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Instance ID</th>
+                      <th colspan="2">Map</th>
+                      <th colspan="2">Station</th>
+                      <th colspan="2">Owner</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="instance, id in svc.activeInstances" v-on:click="form.id = id; loadInstance(id)">
+                      <td>[[ id ]]</td>
+                      <td>[[ instance.map_code ]]</td>
+                      <td>[[ ( Object.keys(svc.landscape.map).indexOf(instance.map_code) == -1 ? '' : svc.landscape.map[instance.map_code].name ) ]]</td>
+                      <td>[[ instance.station_code ]]</td>
+                      <td>[[ ( Object.keys(svc.landscape.station).indexOf(instance.station_code) == -1 ? '' : svc.landscape.station[instance.station_code].name ) ]]</td>
+                      <td>[[ instance.owner_code ]]</td>
+                      <td>[[ ( Object.keys(svc.landscape.owner).indexOf(instance.owner_code) == -1 ? '' : svc.landscape.owner[instance.owner_code].name ) ]]</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="" v-else-if="form.instance.station_code == 'END'">
+                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
+                <h1>This instance has completed.</h1>
+              </div>
+              <div class="instance" v-else>
+                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
+                <h1>[[form.id]]</h1>
+                <hr />
+                <div class="row" v-if="form.instance != null">
+                  <div class="col-4 properties">
+                    <h2>Properties</h2>
+                    <table class="table">
+                      <tbody>
+                        <tr>
+                          <th>Map</th>
+                          <td>[[form.instance.map_code]]</td>
+                          <td>[[svc.landscape.map[form.instance.map_code].name]]</td>
+                        </tr>
+                        <tr>
+                          <th>Station</th>
+                          <td>[[form.instance.station_code]]</td>
+                          <td>[[ ( Object.keys(svc.landscape.station).indexOf(form.instance.station_code) == -1 ? '' : svc.landscape.station[form.instance.station_code].name ) ]]</td>
+                        </tr>
+                        <tr>
+                          <th>Owner</th>
+                          <td>[[form.instance.owner_code]]</td>
+                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(form.instance.owner_code) == -1 ? '' : svc.landscape.owner[form.instance.owner_code].name ) ]]</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button class="btn btn-success form-control mb-3" v-if="form.instance.station_code == 'BEGIN'" v-on:click="progressInstance(null)">Progress</button>
+                    <button class="btn btn-success form-control mb-3"
+                           :style="{ 'background-color': action.color }"
+                            v-for="action, a in svc.landscape.station[form.instance.station_code].actions"
+                            v-if="svc.landscape.station[form.instance.station_code].actions != undefined"
+                            v-on:click="progressInstance(action.code, 'james.downie')">[[action.code]]: [[action.label]]</button>
+                    <ol style="font-family: monospace;" v-if="form.progressLog.length > 0">
+                      <li v-for="entry, i in form.progressLog">[[entry.entry]]</li>
+                    </ol>
+                  </div>
+                  <div class="col-3 variables">
+                    <h2>Variables</h2>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>var</th>
+                          <th>val</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="v, k in form.instance.vars">
+                          <td>[[k]]</td>
+                          <td>[[v]]</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-5 timeline">
+                    <h2>Timeline</h2>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Datetime</th>
+                          <th>Event</th>
+                          <th>Node</th>
+                          <th>Owner</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="entry, i in form.instance.timeline.slice().reverse()">
+                          <td>[[entry.datetime | datetimeFormat]]</td>
+                          <td>[[entry.event_code]]</td>
+                          <td>[[entry.node_type]]:[[entry.node_code]]</td>
+                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(entry.owner_code) == -1 ? '' : svc.landscape.owner[entry.owner_code].name ) ]]</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="row" v-if="form.instance != null">
+                  <div class="col">
+                    <h2>Log</h2>
+                    <table class="table log">
+                      <tbody>
+                        <tr v-for="entry, i in form.instance.log.slice().reverse()">
+                          <td>[[entry.datetime | datetimeFormat]]</td>
+                          <td>[[entry.entry]]</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tabbody" v-else-if="tab == 'create'">
               <table class="table">
                 <thead>
-                  <tr>
-                    <th><button class="btn btn-primary form-control" v-on:click="form.vars.push({ 'var': '', 'val': '' })">Add Variable</button></th>
-                    <th colspan="2">
-                      <div class="input-group">
-                        <select class="form-control" v-model="form.map_code">
-                          <option v-for="map, map_code in svc.landscape.map" :value="map_code">[[map_code]] - [[map.name]]</option>
-                        </select>
-                        <button class="btn btn-success" type="button" :disabled="form.map_code == ''" v-on:click="createSubmit">Create Instance</button>
-                      </div>
-                    </th>
-                  </tr>
                   <tr>
                     <th>var</th>
                     <th>val</th>
@@ -261,7 +371,22 @@
                   </tr>
                 </tbody>
               </table>
-              <pre>[[form]]</pre>
+              <div class="row">
+                <div class="col-3">
+                  <button class="btn btn-primary form-control" v-on:click="form.vars.push({ 'var': '', 'val': '' })">Add Variable</button>
+                </div>
+                <div class="col-9">
+                  <div class="input-group">
+                    <select class="form-control" v-model="form.map_code">
+                      <option v-for="map, map_code in svc.landscape.map" :value="map_code">[[map_code]] - [[map.name]]</option>
+                    </select>
+                    <select class="form-control" v-model="form.owner_code">
+                      <option v-for="owner, owner_code in svc.landscape.owner" :value="owner_code">[[owner_code]] - [[owner.name]]</option>
+                    </select>
+                    <button class="btn btn-success form-control" type="button" :disabled="form.map_code == '' || form.owner_code == ''" v-on:click="createSubmit">Create Instance</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -285,6 +410,7 @@
         </div>
       </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>

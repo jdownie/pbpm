@@ -1,6 +1,7 @@
 var pbpm =
 { loading: 2,
   landscape: {},
+  activeInstances: {},
   cfg: {},
   load: function(cb) {
     var instance = this;
@@ -29,10 +30,24 @@ var pbpm =
     jQuery.post( '/landscape/put/',
                  JSON.stringify(instance.landscape),
                  function(data) {
-                   pbpmApp.landscape = data;
+                   instance.landscape = data;
                  },
                  'json'
                );
+  },
+  instances: {
+    active: {
+      load: function() {
+        var instance = this;
+        jQuery.get( '/instances/active/',
+                    {},
+                    function(data) {
+                      pbpm.activeInstances = data;
+                    },
+                    'json'
+                  );
+      }
+    }
   },
   table: {
     add: function(item, record) {

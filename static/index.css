@@ -24,3 +24,7 @@ input[type="color"] { height: 38px; }
 .editRouter .btn-danger { height: 65px; }
 .datagrid table.table { margin-bottom: 0px; }
 .graphviz img { max-width: 100%; width: 100%; }
+.tabbody.instances table tbody tr td:first-child { font-family: monospace; }
+.tabbody.instances .instance h1 { font-family: monospace; }
+.tabbody.instances .instance .exitButton { right: 24px; top: 73px; position: absolute; }
+.tabbody.instances .instance .variables tr th:nth-child(2), .tabbody.instances .instance .variables tr td:nth-child(2) { text-align: right; }

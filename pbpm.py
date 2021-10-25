@@ -5,7 +5,7 @@ Python Business Process Modelling Class Definitions
 """
 
 from datetime import datetime
-import os, json, enum, sys, uuid
+import os, json, enum, sys, uuid, requests
 
 class pbpmFileEnum(enum.Enum):
   landscape     = 1
@@ -22,7 +22,22 @@ class pbpm:
   path = None
   landscape = dict()
 
-  def __path(self, file_code = None):
+  def __init__(self, path = None):
+    """
+    Initialise a pbpm instance.
+    :param path: The folder in which this pbpm should read and write it's process modelling work.
+    """
+    assert path != None,             "The pbpm class must be initialised referencing a folder in which it can maintain it's state."
+    assert os.path.exists(path),     "The pbpm_config_path specified ({0}) does not exist.".format(path)
+    assert os.access(path, os.W_OK), "The pbpm_config_path specified ({0}) is not writable.".format(path)
+    self.path = path
+    for d in [ pbpmFileEnum.active, pbpmFileEnum.complete ]:
+      dir_path = self.__path(d)
+      if not os.path.exists(dir_path):
+        os.mkdir(dir_path)
+    self.load()
+
+  def __path(self, file_code = None, instance_id = None):
     ret = self.path
     ret = os.path.join(self.path, "landscape.json")                                    if file_code == pbpmFileEnum.landscape else ret
     ret = os.path.join(self.path, "active")                                            if file_code == pbpmFileEnum.active    else ret
@@ -66,21 +81,10 @@ class pbpm:
     fout = open(self.__path(pbpmFileEnum.log), "a")
     fout.write(line)
     fout.close()
-
-  def __init__(self, path = None):
-    """
-    Initialise a pbpm instance.
-    :param path: The folder in which this pbpm should read and write it's process modelling work.
-    """
-    assert path != None,             "The pbpm class must be initialised referencing a folder in which it can maintain it's state."
-    assert os.path.exists(path),     "The pbpm_config_path specified ({0}) does not exist.".format(path)
-    assert os.access(path, os.W_OK), "The pbpm_config_path specified ({0}) is not writable.".format(path)
-    self.path = path
-    for d in [ pbpmFileEnum.active, pbpmFileEnum.complete ]:
-      dir_path = self.__path(d)
-      if not os.path.exists(dir_path):
-        os.mkdir(dir_path)
-    self.load()
+    row = dict()
+    row["datetime"] = dt
+    row["entry"] = entry
+    return row
 
   def load(self):
     """
@@ -113,16 +117,162 @@ class pbpm:
     print("Saved configuration to {0}".format(self.path))
     return None
 
-  def createInstance(self, map_code, vars):
-    id = uuid.uuid4()
-    content = dict()
-    content["map_code"] = map_code
-    content["vars"] = vars
+  def loadInstance(self, id):
+    instance = dict()
+    path = os.path.join(self.__path(pbpmFileEnum.active), "{0}.json".format(id))
+    if not os.path.exists(path):
+      path = os.path.join(self.__path(pbpmFileEnum.complete), "{0}.json".format(id))
+    if os.path.exists(path):
+      fin = open(path, "r")
+      instance = json.load(fin)
+      fin.close()
+    return instance
+
+  def saveInstance(self, id, content):
     dest = os.path.join(self.__path(pbpmFileEnum.active), "{0}.json".format(id))
     fout = open(dest, "w")
     json.dump(content, fout)
     fout.close()
+
+  def instanceTimelineAdd(self, instance, node_type, node_code, event_code, owner_code):
+    record = dict()
+    record["node_type"] = node_type
+    record["node_code"] = node_code
+    record["event_code"] = event_code
+    record["owner_code"] = owner_code
+    record["datetime"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    instance["timeline"].append(record)
+
+  def createInstance(self, map_code, owner_code, vars):
+    id = uuid.uuid4()
+    instance = dict()
+    instance["map_code"] = map_code
+    instance["owner_code"] = owner_code
+    instance["vars"] = vars
+    instance["timeline"] = list()
+    instance["log"] = list()
+    instance["station_code"] = "BEGIN"
+    instance["log"].append(self.__log("Creating instance {0}".format(id)))
+    self.instanceTimelineAdd(instance, "station", "BEGIN", "ARRIVE", owner_code)
+    self.saveInstance(id, instance)
+    self.progressInstance(id, owner_code = owner_code)
     return id
+
+  def progressInstance(self, id, action_code = None, owner_code = None):
+    step_limit = 3
+    instance = self.loadInstance(id)
+    instance["log"].append(self.__log("Loaded instance {0}".format(id)))
+    config = self.landscape["map"][instance["map_code"]]["config"]
+    bookmark = None
+    for i in range(len(config)):
+      if config[i]["type"] == "station" and config[i]["code"] == instance["station_code"]:
+        bookmark = i
+        instance["log"].append(self.__log("Set bookmark to {0}".format(i)))
+    if bookmark == None:
+      instance["log"].__log("Unable to identify an active station for instance {0}'s {1} station".format(id, instance["station_code"]))
+      instance["station_code"] = "ERROR"
+    else:
+      if action_code != None:
+        instance["log"].append(self.__log("Taking action {0} on {1}".format(action_code, instance["station_code"])))
+        leads_to = None
+        actions = self.landscape["map"][instance["map_code"]]["config"][bookmark]["actions"]
+        leads_to = None
+        for a in range(len(actions)):
+          if actions[a]["code"] == action_code and "leads_to" in actions[a].keys():
+            leads_to = actions[a]["leads_to"]
+        if leads_to != None:
+          instance["log"].append(self.__log("Action {0} lead to {1}".format(action_code, leads_to)))
+          bookmark = leads_to
+      while step_limit > 0 and instance["station_code"] != "ERROR" and instance["station_code"] != "END":
+        instance["log"].append(self.__log("Taking a step..."))
+        while "leads_to" in config[bookmark].keys():
+          self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "DEPART", owner_code)
+          bookmark = config[bookmark]["leads_to"]
+          self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
+          instance["log"].append(self.__log("Shifted bookmark to {0}".format(bookmark)))
+        if config[bookmark]["type"] == "router":
+          instance["log"].append(self.__log("Evaluating router {0}".format(config[bookmark]["code"])))
+          router = self.landscape["router"][config[bookmark]["code"]]
+          leads_to = None
+          for config_action in config[bookmark]["actions"]:
+            vars = list()
+            vars.append("class vars:")
+            for k, v in instance["vars"].items():
+              if isinstance(v, str):
+                v = "\"{0}\"".format(v)
+              vars.append("  {0} = {1}".format(k, v))
+            expression = None
+            for router_action in router["actions"]:
+              if config_action["code"] == router_action["action_code"]:
+                expression = router_action["expression"]
+            if leads_to == None and expression != None:
+              expression = "\n".join([ "\n".join(vars), expression ])
+              instance["log"].append(self.__log(expression))
+              try:
+                result = exec(expression)
+                instance["log"].append(self.__log("Evaluated {0} to {1} for config action {2}".format(expression, result, config_action["code"])))
+                if result:
+                  leads_to = config_action["leads_to"]
+              except Exception as e:
+                instance["log"].append(self.__log("ERROR: {0}".format(str(e))))
+                instance["station_code"] = "ERROR"
+                break
+          if leads_to != None:
+            self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "DEPART", owner_code)
+            bookmark = leads_to
+            self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
+            instance["log"].append(self.__log("Shifted bookmark to {0}".format(bookmark)))
+        elif config[bookmark]["type"] == "service":
+          instance["log"].append(self.__log("Evaluating service {0}".format(config[bookmark]["code"])))
+          service = self.landscape["service"][config[bookmark]["code"]]
+          url = service["url_template"]
+          for k, v in instance["vars"].items():
+            var = "{" + k + "}"
+            val = str(v)
+            instance["log"].append(self.__log("Replacing {0} with {1}".format(var, val)))
+            url = url.replace(var, val)
+          instance["log"].append(self.__log("Generated URL {0}".format(url)))
+          try:
+            content = requests.get(url).text
+            new_vars = json.loads(content)
+            for k, v in new_vars.items():
+              self.__log("{0} = {1}".format(k, v))
+              instance["vars"][k] = v
+          except Exception as e:
+            instance["log"].append(self.__log("ERROR: {0}".format(str(e))))
+            instance["station_code"] = "ERROR"
+            break
+        elif config[bookmark]["type"] == "station":
+          instance["station_code"] = config[bookmark]["code"]
+          instance["log"].append(self.__log("Found the next station, coming to rest on {0}".format(instance["station_code"])))
+          break
+        else:
+          instance["log"].append(self.__log("ERROR: Unable to process node {0}".format(json.dumps(config[bookmark]))))
+          instance["station_code"] = "ERROR"
+          break
+        step_limit -= 1
+    self.saveInstance(id, instance)
+    instance["log"].append(self.__log("Saved instance {0}".format(id)))
+    if instance["station_code"] == "END":
+      src = os.path.join(self.__path(pbpmFileEnum.active),   "{0}.json".format(id))
+      dst = os.path.join(self.__path(pbpmFileEnum.complete), "{0}.json".format(id))
+      os.rename(src, dst)
+      instance["log"].append(self.__log("Found END, moving to {0}".format(dst)))
+      step_limit = 0
+    return instance
+
+  def activeInstances(self):
+    path = self.__path(pbpmFileEnum.active)
+    ret = dict()
+    for entry in os.listdir(path):
+      id, ext = os.path.splitext(entry)
+      instance = self.loadInstance(id)
+      record = dict()
+      record["station_code"] = instance["station_code"] if "station_code" in instance.keys() else None
+      record["owner_code"]   = instance["owner_code"]   if "owner_code"   in instance.keys() else None
+      record["map_code"]     = instance["map_code"]     if "map_code"     in instance.keys() else None
+      ret[id] = record
+    return ret
 
   def get(self):
     return self.path
