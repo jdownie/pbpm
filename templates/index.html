@@ -269,15 +269,30 @@
                 <h1>This instance has completed.</h1>
               </div>
               <div class="" v-else-if="form.instance != null && form.instance.station_code == 'ERROR'">
-                <h1>This instance is in ERROR.</h1>
-                    <table class="table log">
-                      <tbody>
-                        <tr v-for="entry, i in form.instance.log.slice().reverse()">
-                          <td>[[entry.datetime | datetimeFormat]]</td>
-                          <td><pre>[[entry.entry]]</pre></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div class="row">
+                  <div class="col">
+                    <h1>This instance is in ERROR.</h1>
+                  </div>
+                  <div class="col">
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text" id="basic-addon1">Resurrect on...</span>
+                      <select class="form-control" v-model="form.bookmark" v-on:change="resurrectInstance">
+                        <option></option>
+                        <option v-for="record, i in svc.landscape.map[form.instance.map_code].config"
+                               :value="i"
+                                v-if="record.type == 'station' && [ 'END' ].indexOf(record.code) == -1">[[ svc.landscape | configStepLabel(record, form.code, i) ]]</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <table class="table log">
+                  <tbody>
+                    <tr v-for="entry, i in form.instance.log.slice().reverse()">
+                      <td>[[entry.datetime | datetimeFormat]]</td>
+                      <td><pre>[[entry.entry]]</pre></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
               <div class="instance" v-else-if="form.instance != null">
                 <h1>[[form.id]]</h1>
@@ -304,15 +319,18 @@
                         </tr>
                       </tbody>
                     </table>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Owner</span>
+                      <select class="form-control" v-model="form.owner_code">
+                        <option v-for="owner, owner_code in svc.landscape.owner" :value="owner_code">[[owner.name]]</option>
+                      </select>
+                    </div>
                     <button class="btn btn-success form-control mb-3" v-if="form.instance.station_code == 'BEGIN'" v-on:click="progressInstance(null)">Progress</button>
                     <button class="btn btn-success form-control mb-3"
                            :style="{ 'background-color': action.color }"
                             v-if="Object.keys(svc.landscape.station).indexOf(form.instance.station_code) != -1 && Object.keys(svc.landscape.station[form.instance.station_code]).indexOf('actions') != -1"
                             v-for="action, a in svc.landscape.station[form.instance.station_code].actions"
-                            v-on:click="progressInstance(action.code, 'james.downie')">[[action.code]]: [[action.label]]</button>
-                    <ol style="font-family: monospace;" v-if="form.progressLog.length > 0">
-                      <li v-for="entry, i in form.progressLog">[[entry.entry]]</li>
-                    </ol>
+                            v-on:click="progressInstance(action.code, form.owner_code)">[[action.code]]: [[action.label]]</button>
                   </div>
                   <div class="col-3 variables">
                     <h2>Variables</h2>

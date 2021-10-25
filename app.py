@@ -90,13 +90,18 @@ def instanceCreate():
 
 @app.route('/instance/progress/<id>')
 def instanceProgress(id):
-  log = p.progressInstance(id)
-  return json.dumps(log)
+  p.progressInstance(id)
+  return id
 
 @app.route('/instance/progress/<id>/<action_code>/<owner_code>')
 def instanceProgressAction(id, action_code, owner_code):
-  log = p.progressInstance(id, action_code = action_code, owner_code = owner_code)
-  return json.dumps(log)
+  p.progressInstance(id, action_code = action_code, owner_code = owner_code)
+  return id
+
+@app.route('/instance/resurrect/<id>/<bookmark>/<owner_code>')
+def instanceResurrectAction(id, bookmark, owner_code):
+  log = p.resurrectInstance(id, bookmark = bookmark, owner_code = owner_code)
+  return id
 
 @app.route('/instances/active/')
 def instancesActive():

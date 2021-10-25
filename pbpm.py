@@ -158,6 +158,17 @@ class pbpm:
     self.progressInstance(id, owner_code = owner_code)
     return id
 
+  def resurrectInstance(self, id, bookmark, owner_code = None):
+    bookmark = int(bookmark)
+    instance = self.loadInstance(id);
+    instance["log"].append(self.__log("Resurrecting to {0}".format(bookmark)))
+    self.instanceTimelineAdd(instance, "station", "ERROR", "DEPART", owner_code)
+    config_item = self.landscape["map"][instance["map_code"]]["config"][bookmark]
+    instance["log"].append(self.__log("Found station {0}".format(config_item["code"])))
+    instance["station_code"] = config_item["code"]
+    self.instanceTimelineAdd(instance, "station", instance["station_code"], "ARRIVE", owner_code)
+    self.saveInstance(id, instance)
+
   def progressInstance(self, id, action_code = None, owner_code = None):
     step_limit = 3
     instance = self.loadInstance(id)

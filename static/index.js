@@ -248,7 +248,7 @@ var pbpmApp = new Vue(
         vars.push({ 'var': 'floatVar', 'val': 7.3 });
         this.form = { 'vars': vars, 'map_code': 'ND', 'owner_code': 'ringo.starr' };
       } else if (this.tab == 'instances') {
-        this.form = { 'id': null, 'instance': null, 'progressLog': [] };
+        this.form = { 'id': null, 'instance': null, 'bookmark': '', 'owner_code': 'john.doe' };
         this.svc.instances.active.load();
       } else if (this.tab == 'graphviz') {
         this.form = { 'code': Object.keys(this.svc.landscape.map)[0] };
@@ -259,6 +259,12 @@ var pbpmApp = new Vue(
     selectTab: function(tab) {
       this.tab = tab;
       this.resetForm();
+    },
+    resurrectInstance: function(e) {
+      var url = '/instance/resurrect/' + this.form.id + '/' + this.form.bookmark + '/' + 'james.downie';
+      jQuery.get(url, {}, function(data) {
+        this.selectTab('instances');
+      });
     },
     delMapConfigItem: function(i) {
       // First, make sure that nothing leads to this index...
@@ -304,8 +310,7 @@ var pbpmApp = new Vue(
         url = url + '/' + action_code + '/' + owner_code;
       }
       jQuery.get(url, {}, function(data) {
-        var j = JSON.parse(data);
-        pbpmApp.form.progressLog = j;
+        console.log(data);
         pbpmApp.loadInstance(pbpmApp.form.id);
       });
     }
