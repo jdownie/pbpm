@@ -262,11 +262,23 @@
                   </tbody>
                 </table>
               </div>
-              <div class="" v-else-if="form.instance.station_code == 'END'">
+              <div class="" v-else-if="form.instance != null && form.instance.station_code == 'END'">
                 <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>This instance has completed.</h1>
               </div>
-              <div class="instance" v-else>
+              <div class="" v-else-if="form.instance != null && form.instance.station_code == 'ERROR'">
+                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
+                <h1>This instance is in ERROR.</h1>
+                    <table class="table log">
+                      <tbody>
+                        <tr v-for="entry, i in form.instance.log.slice().reverse()">
+                          <td>[[entry.datetime | datetimeFormat]]</td>
+                          <td><pre>[[entry.entry]]</pre></td>
+                        </tr>
+                      </tbody>
+                    </table>
+              </div>
+              <div class="instance" v-else-if="form.instance != null">
                 <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>[[form.id]]</h1>
                 <hr />
@@ -295,8 +307,8 @@
                     <button class="btn btn-success form-control mb-3" v-if="form.instance.station_code == 'BEGIN'" v-on:click="progressInstance(null)">Progress</button>
                     <button class="btn btn-success form-control mb-3"
                            :style="{ 'background-color': action.color }"
+                            v-if="Object.keys(svc.landscape.station).indexOf(form.instance.station_code) != -1 && Object.keys(svc.landscape.station[form.instance.station_code]).indexOf('actions') != -1"
                             v-for="action, a in svc.landscape.station[form.instance.station_code].actions"
-                            v-if="svc.landscape.station[form.instance.station_code].actions != undefined"
                             v-on:click="progressInstance(action.code, 'james.downie')">[[action.code]]: [[action.label]]</button>
                     <ol style="font-family: monospace;" v-if="form.progressLog.length > 0">
                       <li v-for="entry, i in form.progressLog">[[entry.entry]]</li>

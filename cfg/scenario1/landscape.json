@@ -66,50 +66,6 @@
         }
       ]
     },
-    "M2": {
-      "name": "Map 2",
-      "config": [
-        {
-          "type": "station",
-          "code": "BEGIN",
-          "leads_to": 2
-        },
-        {
-          "type": "station",
-          "code": "END"
-        },
-        {
-          "type": "station",
-          "code": "A",
-          "actions": [
-            {
-              "code": "GO",
-              "leads_to": 3
-            }
-          ]
-        },
-        {
-          "type": "station",
-          "code": "B",
-          "actions": [
-            {
-              "code": "GO",
-              "leads_to": 4
-            }
-          ]
-        },
-        {
-          "type": "station",
-          "code": "C",
-          "actions": [
-            {
-              "code": "GO",
-              "leads_to": 1
-            }
-          ]
-        }
-      ]
-    },
     "RANDOM": {
       "name": "Random",
       "config": [
@@ -188,6 +144,50 @@
           "type": "service",
           "code": "RANDOM",
           "leads_to": 6
+        }
+      ]
+    },
+    "SIMPLE": {
+      "name": "Simple",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 2
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "A",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 3
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "B",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 4
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "C",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 1
+            }
+          ]
         }
       ]
     }
