@@ -176,16 +176,18 @@ class pbpm:
         instance["log"].append(self.__log("Taking action {0} on {1}".format(action_code, instance["station_code"])))
         leads_to = None
         actions = self.landscape["map"][instance["map_code"]]["config"][bookmark]["actions"]
-        leads_to = None
         for a in range(len(actions)):
+          instance["log"].append(self.__log("Considering action {0}: {1}".format(a, json.dumps(actions[a]))))
           if actions[a]["code"] == action_code and "leads_to" in actions[a].keys():
             leads_to = actions[a]["leads_to"]
         if leads_to != None:
           instance["log"].append(self.__log("Action {0} lead to {1}".format(action_code, leads_to)))
+          self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "DEPART", owner_code)
           bookmark = leads_to
+          self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
       while step_limit > 0 and instance["station_code"] != "ERROR" and instance["station_code"] != "END":
         instance["log"].append(self.__log("Taking a step..."))
-        while "leads_to" in config[bookmark].keys():
+        while "leads_to" in config[bookmark].keys() and config[bookmark]["type"] != "service":
           self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "DEPART", owner_code)
           bookmark = config[bookmark]["leads_to"]
           self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
@@ -204,12 +206,12 @@ class pbpm:
             expression = None
             for router_action in router["actions"]:
               if config_action["code"] == router_action["action_code"]:
-                expression = router_action["expression"]
+                expression = "result = ({0})".format(router_action["expression"])
             if leads_to == None and expression != None:
               expression = "\n".join([ "\n".join(vars), expression ])
               instance["log"].append(self.__log(expression))
               try:
-                result = exec(expression)
+                exec(expression, globals())
                 instance["log"].append(self.__log("Evaluated {0} to {1} for config action {2}".format(expression, result, config_action["code"])))
                 if result:
                   leads_to = config_action["leads_to"]
@@ -236,8 +238,12 @@ class pbpm:
             content = requests.get(url).text
             new_vars = json.loads(content)
             for k, v in new_vars.items():
-              self.__log("{0} = {1}".format(k, v))
+              instance["log"].append(self.__log("{0} = {1}".format(k, v)))
               instance["vars"][k] = v
+            self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "DEPART", owner_code)
+            bookmark = config[bookmark]["leads_to"]
+            self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
+            instance["log"].append(self.__log("Shifted bookmark to {0}".format(bookmark)))
           except Exception as e:
             instance["log"].append(self.__log("ERROR: {0}".format(str(e))))
             instance["station_code"] = "ERROR"
