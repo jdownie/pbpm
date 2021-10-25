@@ -19,6 +19,20 @@ var pbpmApp = new Vue(
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
   },
   filters: {
+    displayName: function(code, type) {
+      ret = '';
+      if (Object.keys(pbpmApp.svc.landscape[type]).indexOf(code) != -1) {
+        cols = [ 'name', 'url_template' ];
+        var col = null;
+        for (var i in cols) {
+          if (col == null && Object.keys(pbpmApp.svc.landscape[type][code]).indexOf(cols[i]) != -1) {
+            col = cols[i];
+          }
+        }
+        ret = ( col == null ? code : pbpmApp.svc.landscape[type][code][col] );
+      }
+      return ret;
+    },
     datetimeFormat: function(utc) {
       var ret = moment(utc).format('D MMM, H:mm:sa');
       return ret;

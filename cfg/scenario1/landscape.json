@@ -28,17 +28,12 @@
           "leads_to": 2
         },
         {
-          "type": "service",
-          "code": "RANDOM",
-          "leads_to": 5
-        },
-        {
           "type": "station",
           "code": "QA",
           "actions": [
             {
               "code": "COMPLETE",
-              "leads_to": 6
+              "leads_to": 5
             },
             {
               "code": "REJECT",
@@ -47,15 +42,24 @@
           ]
         },
         {
+          "type": "service",
+          "code": "RANDOM",
+          "leads_to": 6
+        },
+        {
           "type": "router",
           "code": "RANDOM",
           "actions": [
             {
-              "code": "T1",
+              "code": "1",
               "leads_to": 2
             },
             {
-              "code": "T2",
+              "code": "2",
+              "leads_to": 2
+            },
+            {
+              "code": "3",
               "leads_to": 1
             }
           ]

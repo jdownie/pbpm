@@ -48,7 +48,7 @@
           </div>
         </div>
         <div class="row editStation" v-else-if="tab == 'editStation'">
-          <h1>[[form.code]] - [[svc.landscape.station[form.code].name]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('station') ]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('station')">Exit</button>
           <div class="col datagrid">
             <table class="table">
@@ -82,14 +82,14 @@
           </div>
         </div>
         <div class="row editMap" v-else-if="tab == 'editMap'">
-          <h1>[[form.code]] - [[svc.landscape.map[form.code].name]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('map') ]]</h1>
           <button class="btn btn-secondary form-control exitButton" v-on:click="selectTab('map')">Exit</button>
           <div class="col-6">
             <div class="input-group mb-1">
               <span class="input-group-text" id="basic-addon1">Add a Station</span>
               <select class="form-control" v-on:change="mapAddStation" v-model="form.add.station_code">
                 <option></option>
-                <option v-for="record, code in svc.landscape.station" :value="code">[[code]]: [[record.name]]</option>
+                <option v-for="record, code in svc.landscape.station" :value="code">[[code]]: [[ code | displayName('station') ]]</option>
               </select>
             </div>
             <div class="input-group mb-1">
@@ -113,7 +113,7 @@
                   v-on:click="mapSelect(i)">
                 <div class="ms-2 me-auto">
                   <div class="fw-bold">[[node.code]]</div>
-                  <span v-if="svc.landscape.station[node.code] != undefined">[[svc.landscape.station[node.code].name]]</span>
+                  <span v-if="svc.landscape.station[node.code] != undefined">[[ node.code | displayName('station') ]]</span>
                   <div class="list-group stationActions" v-if="svc.landscape.station[node.code] != undefined && svc.landscape.station[node.code].actions != undefined">
                     <button v-for="action, a in node.actions"
                             type="button"
@@ -190,7 +190,7 @@
                     <li class="list-group-item"
                        :class="{ 'active': code== form.code }"
                         v-on:click="form.code = ( code == form.code ? '' : code )"
-                        v-for="record, code in svc.landscape.map">[[code]]: [[record.name]]</li>
+                        v-for="record, code in svc.landscape.map">[[code]]: [[ code | displayName('map') ]]</li>
                   </ul>
                 </div>
                 <div class="col-10">
@@ -253,11 +253,11 @@
                     <tr v-for="instance, id in svc.activeInstances" v-on:click="form.id = id; loadInstance(id)">
                       <td>[[ id ]]</td>
                       <td>[[ instance.map_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.map).indexOf(instance.map_code) == -1 ? '' : svc.landscape.map[instance.map_code].name ) ]]</td>
+                      <td>[[ instance.map_code | displayName('map') ]]</td>
                       <td>[[ instance.station_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.station).indexOf(instance.station_code) == -1 ? '' : svc.landscape.station[instance.station_code].name ) ]]</td>
+                      <td>[[ instance.station_code | displayName('station') ]]</td>
                       <td>[[ instance.owner_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.owner).indexOf(instance.owner_code) == -1 ? '' : svc.landscape.owner[instance.owner_code].name ) ]]</td>
+                      <td>[[ instance.owner_code | displayName('owner') ]]</td>
                     </tr>
                   </tbody>
                 </table>
@@ -278,17 +278,17 @@
                         <tr>
                           <th>Map</th>
                           <td>[[form.instance.map_code]]</td>
-                          <td>[[svc.landscape.map[form.instance.map_code].name]]</td>
+                          <td>[[ form.instance.map_code | displayName('map') ]]</td>
                         </tr>
                         <tr>
                           <th>Station</th>
                           <td>[[form.instance.station_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.station).indexOf(form.instance.station_code) == -1 ? '' : svc.landscape.station[form.instance.station_code].name ) ]]</td>
+                          <td>[[ form.instance.station_code | displayName('station') ]]</td>
                         </tr>
                         <tr>
                           <th>Owner</th>
                           <td>[[form.instance.owner_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(form.instance.owner_code) == -1 ? '' : svc.landscape.owner[form.instance.owner_code].name ) ]]</td>
+                          <td>[[ form.instance.owner_code | displayName('owner') ]]</td>
                         </tr>
                       </tbody>
                     </table>
@@ -335,7 +335,7 @@
                           <td>[[entry.datetime | datetimeFormat]]</td>
                           <td>[[entry.event_code]]</td>
                           <td>[[entry.node_type]]:[[entry.node_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(entry.owner_code) == -1 ? '' : svc.landscape.owner[entry.owner_code].name ) ]]</td>
+                          <td>[[ entry.owner_code | displayName('owner') ]]</td>
                         </tr>
                       </tbody>
                     </table>
