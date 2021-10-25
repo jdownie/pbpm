@@ -158,7 +158,7 @@
               </div>
             </div>
             <hr />
-            <div id="diagram"></div>
+            <img :src="'/graph/' + form.code + '.svg?renderTrigger=' + form.renderTrigger" />
           </div>
         </div>
         <div class="row tables" v-else>
@@ -237,6 +237,9 @@
               </div>
             </div>
             <div class="tabbody instances" v-if="tab == 'instances'">
+              <button class="btn btn-secondary exitButton"
+              v-if="form.instance != null"
+                      v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Close Instance</button>
               <div v-if="form.id == null">
                 <h1>[[ Object.keys(svc.activeInstances).length ]] Active Instances</h1>
                 <hr />
@@ -263,11 +266,9 @@
                 </table>
               </div>
               <div class="" v-else-if="form.instance != null && form.instance.station_code == 'END'">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>This instance has completed.</h1>
               </div>
               <div class="" v-else-if="form.instance != null && form.instance.station_code == 'ERROR'">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>This instance is in ERROR.</h1>
                     <table class="table log">
                       <tbody>
@@ -279,7 +280,6 @@
                     </table>
               </div>
               <div class="instance" v-else-if="form.instance != null">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>[[form.id]]</h1>
                 <hr />
                 <div class="row" v-if="form.instance != null">

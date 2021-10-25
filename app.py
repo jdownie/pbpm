@@ -120,7 +120,7 @@ def graph(map_code):
       for j in range(len(item["actions"])):
         dot.node("{0}.{1}".format(i, j), item["actions"][j]["code"], shape="cds")
         dot.edge(str(i), "{0}.{1}".format(i, j), constraint="true")
-        if "leads_to" in item["actions"][j].keys():
+        if "leads_to" in item["actions"][j].keys() and item["actions"][j]["leads_to"] != None:
           dot.edge("{0}.{1}".format(i, j), str(item["actions"][j]["leads_to"]), constraint="true")
     elif "leads_to" in item.keys():
       dot.edge(str(i), str(item["leads_to"]), constraint="true")

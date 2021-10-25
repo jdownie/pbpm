@@ -17,7 +17,7 @@ body { padding-top: 20px; background-color: lightgrey; }
 .datagrid table.table th { font-size: 16pt; }
 .tabbody.datagrid table.table button.btn { font-size: 12pt; font-weight: bold; }
 .tabbody.datagrid table.table .btn-group { width: 100%; }
-button.btn.exitButton { position: absolute; width: 77px; top: 30px; right: 30px; }
+button.btn.exitButton { position: absolute; max-width: 180px; top: 30px; right: 30px; }
 input[type="color"] { height: 38px; }
 .list-group.stationActions { width: 100%; }
 .editRouter .btn-success { height: 141px; }

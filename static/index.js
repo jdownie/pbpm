@@ -72,6 +72,7 @@ var pbpmApp = new Vue(
         record.actions = dstActions;
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.station_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -80,6 +81,7 @@ var pbpmApp = new Vue(
         var record = { 'type': 'service', 'code': this.form.add.service_code };
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.service_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -95,6 +97,7 @@ var pbpmApp = new Vue(
         record.actions = dstActions;
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.router_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -180,6 +183,7 @@ var pbpmApp = new Vue(
         node = node.actions[src[1]];
       }
       node.leads_to = dst;
+      this.form.renderTrigger++;
       this.svc.save();
     },
     editStation: function(code) {
@@ -224,7 +228,7 @@ var pbpmApp = new Vue(
     },
     editMap: function(code) {
       this.selectTab('editMap');
-      this.form = { 'code': code, 'add': { 'station_code': '', 'service_code': '', 'router_code': '' }, 'edit': null, 'leads_to': '' };
+      this.form = { 'code': code, 'add': { 'station_code': '', 'service_code': '', 'router_code': '' }, 'edit': null, 'leads_to': '', 'renderTrigger': 0 };
     },
     resetForm: function() {
       var map = this.svc.cfg.table;
@@ -257,7 +261,26 @@ var pbpmApp = new Vue(
       this.resetForm();
     },
     delMapConfigItem: function(i) {
+      // First, make sure that nothing leads to this index...
+      var config = this.svc.landscape.map[this.form.code].config;
+      for (var j in config) {
+        var item = config[j];
+        if (Object.keys(item).indexOf('actions') != -1) {
+          for (var k in item.actions) {
+            var action = item.actions[k];
+            if (action.leads_to == i) {
+              action.leads_to = null;
+            }
+          }
+        }
+        if (Object.keys(item).indexOf('leads_to') != -1) {
+          if (item.leads_to == i) {
+            item.leads_to = null;
+          }
+        }
+      }
       this.svc.landscape.map[this.form.code].config.splice(i, 1);
+      this.form.renderTrigger++;
       this.svc.save();
     },
     createSubmit: function(e) {

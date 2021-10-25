@@ -56,10 +56,20 @@
             },
             {
               "code": "2",
-              "leads_to": 2
+              "leads_to": 7
             },
             {
               "code": "3",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "STEP",
+          "actions": [
+            {
+              "code": "COMPLETE",
               "leads_to": 1
             }
           ]
@@ -268,6 +278,17 @@
           "label": "Random",
           "color": "#ff2ed2",
           "code": "RANDOM"
+        }
+      ]
+    },
+    "STEP": {
+      "name": "Step",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete",
+          "color": "#198754",
+          "code": "COMPLETE"
         }
       ]
     }
