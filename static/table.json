@@ -1,0 +1,6 @@
+{ "station": { "label": "Stations", "fields": { "name": "Name" } },
+  "service": { "label": "Services", "fields": { "url_template": "URL Template" } },
+  "router": { "label": "Routers", "fields": { "description": "Description" } },
+  "owner": { "label": "Owners", "fields": { "name": "Name" } },
+  "map": { "label": "Maps", "fields": { "name": "Name" } }
+}

@@ -61,6 +61,50 @@
           ]
         }
       ]
+    },
+    "M2": {
+      "name": "Map 2",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 2
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "A",
+          "actions": [
+            {
+              "code": "GO",
+              "leads_to": 3
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "B",
+          "actions": [
+            {
+              "code": "GO",
+              "leads_to": 4
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "C",
+          "actions": [
+            {
+              "code": "GO",
+              "leads_to": 1
+            }
+          ]
+        }
+      ]
     }
   },
   "station": {
@@ -89,6 +133,39 @@
           "label": "Reject to Prepress",
           "color": "#bd0f0f",
           "code": "REJECT"
+        }
+      ]
+    },
+    "A": {
+      "name": "A",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Go",
+          "color": "#198754",
+          "code": "GO"
+        }
+      ]
+    },
+    "B": {
+      "name": "B",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Go",
+          "color": "#198754",
+          "code": "GO"
+        }
+      ]
+    },
+    "C": {
+      "name": "C",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Go",
+          "color": "#198754",
+          "code": "GO"
         }
       ]
     }

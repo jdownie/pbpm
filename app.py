@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: iso-8859-15 -*-
 
-import os, pbpm, sys, json, random, html
-from flask import Flask, render_template, send_from_directory, request, current_app
+import os, pbpm, sys, json, random, html, tempfile, graphviz
+from flask import Flask, render_template, send_file, request, current_app
 
 # Establish the pbpm instance that this service will work with...
 
@@ -33,6 +33,7 @@ def favicon():
 
 @app.route('/js/<page>')
 @app.route('/css/<page>')
+@app.route('/cfg/<page>')
 def cssFile(page):
   return current_app.send_static_file(page)
 
@@ -77,4 +78,22 @@ def instanceCreate():
   vars = json.loads(request.form['vars'])
   ret = dict()
   ret["id"] = p.createInstance(map_code, vars)
+  return ret
+
+@app.route('/graph/<map_code>.svg')
+def graph(map_code):
+  dot = graphviz.Digraph(comment="The Round Table", format="svg")
+  config = p.landscape["map"][map_code]["config"]
+  for i in range(len(config)):
+    item = config[i]
+    dot.node(str(i), "{0}:{1}".format(item["type"], item["code"]))
+    if "leads_to" in item.keys():
+      dot.edge(str(i), str(item["leads_to"]), constraint='true')
+  #dot.edges(['AB', 'AL'])
+  fout = tempfile.NamedTemporaryFile(delete=False)
+  tmp = fout.name
+  fout.write(dot.pipe())
+  fout.close()
+  ret = send_file(tmp, as_attachment=True, attachment_filename="{0}.svg".format(map_code))
+  os.remove(tmp)
   return ret

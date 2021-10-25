@@ -23,3 +23,4 @@ input[type="color"] { height: 38px; }
 .editRouter .btn-success { height: 141px; }
 .editRouter .btn-danger { height: 65px; }
 .datagrid table.table { margin-bottom: 0px; }
+.graphviz img { max-width: 100%; width: 100%; }

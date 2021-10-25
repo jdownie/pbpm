@@ -7,7 +7,7 @@
   </head>
   <body>
     <div id="pbpm">
-      <div class="container-fluid" v-if="svc!= null && svc.landscape != null">
+      <div class="container-fluid" v-if="svc != null && svc.loading == 0">
         <div class="row editRouter" v-if="tab == 'editRouter'">
           <h1>[[form.code]] - [[svc.landscape.router[form.code].description]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('router')">Exit</button>
@@ -168,8 +168,11 @@
               <li class="nav-item" v-on:click="selectTab('welcome')">
                 <a class="nav-link" :class="{ 'active': tab == 'welcome' }" aria-current="page" href="#">Welcome</a>
               </li>
-              <li class="nav-item" v-for="record, t in cfg.table" v-on:click="selectTab(t)">
+              <li class="nav-item" v-for="record, t in svc.cfg.table" v-on:click="selectTab(t)">
                 <a class="nav-link" :class="{ 'active': tab == t }" aria-current="page" href="#">[[record.label]]</a>
+              </li>
+              <li class="nav-item" v-on:click="selectTab('graphviz')">
+                <a class="nav-link" :class="{ 'active': tab == 'graphviz' }" aria-current="page" href="#">graphviz</a>
               </li>
               <li class="nav-item" v-on:click="selectTab('create')">
                 <a class="nav-link" :class="{ 'active': tab == 'create' }" aria-current="page" href="#">Create</a>
@@ -178,6 +181,21 @@
             <div class="tabbody" v-if="tab == 'welcome'">
               <h1>Welcome</h1>
             </div>
+            <div class="tabbody graphviz" v-if="tab == 'graphviz'">
+              <div class="row">
+                <div class="col-2">
+                  <ul class="list-group">
+                    <li class="list-group-item"
+                       :class="{ 'active': code== form.code }"
+                        v-on:click="form.code = ( code == form.code ? '' : code )"
+                        v-for="record, code in svc.landscape.map">[[code]]: [[record.name]]</li>
+                  </ul>
+                </div>
+                <div class="col-10">
+                  <img v-if="form.code != ''" :src="'/graph/' + form.code + '.svg'" />
+                </div>
+              </div>
+            </div>
             <div class="tabbody datagrid" v-if="[ 'station', 'service', 'router', 'owner', 'map' ].indexOf(tab) != -1">
               <div class="row" v-if="form != null">
                 <div class="col">
@@ -185,20 +203,20 @@
                     <thead>
                       <tr>
                         <td>
-                          <input type="text" class="form-control" v-model="form.code" @keyup.enter="addItem(tab)" placeholder="Code">
+                          <input type="text" class="form-control" v-model="form.code" @keyup.enter="tableAdd(tab)" placeholder="Code">
                         </td>
-                        <td v-for="label, field in cfg.table[tab].fields">
-                          <input type="text" class="form-control" v-model="form[field]" @keyup.enter="addItem(tab)" :placeholder="label">
+                        <td v-for="label, field in svc.cfg.table[tab].fields">
+                          <input type="text" class="form-control" v-model="form[field]" @keyup.enter="tableAdd(tab)" :placeholder="label">
                         </td>
                         <td>
-                          <button class="btn btn-success form-control" v-on:click="addItem(tab)">&plus;</button>
+                          <button class="btn btn-success form-control" v-on:click="tableAdd(tab)">&plus;</button>
                         </td>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="record, code in svc.landscape[tab]">
                         <td>[[code]]</td>
-                        <td v-if="form.edit_code == code" v-for="label, field in cfg.table[tab].fields">
+                        <td v-if="form.edit_code == code" v-for="label, field in svc.cfg.table[tab].fields">
                           <input type="text" class="form-control" v-model="svc.landscape[tab][form.edit_code][field]" @keyup.enter="editItemEnd(tab);">
                         </td>
                         <td v-else v-on:click="editItemBegin(tab, code)">[[(record[field])]]</td>
@@ -207,7 +225,7 @@
                             <button class="btn btn-primary form-control" v-if="tab == 'map'" v-on:click="editMap(code)">&#128393;</button>
                             <button class="btn btn-primary form-control" v-if="tab == 'station'" v-on:click="editStation(code)">&#128393;</button>
                             <button class="btn btn-primary form-control" v-if="tab == 'router'" v-on:click="editRouter(code)">&#128393;</button>
-                            <button class="btn btn-danger form-control" v-on:click="delItem(tab, code)">&times;</button>
+                            <button class="btn btn-danger form-control" v-on:click="tableDel(tab, code)">&times;</button>
                           </div>
                         </td>
                       </tr>
