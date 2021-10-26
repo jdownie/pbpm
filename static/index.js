@@ -269,11 +269,15 @@ var pbpmApp = new Vue(
     delMapConfigItem: function(i) {
       // First, make sure that nothing leads to this index...
       var config = this.svc.landscape.map[this.form.code].config;
-      for (var j in config) {
-        var item = config[j];
+      var item = null;
+      var action = null;
+      var j = null;
+      var k = null;
+      for (j in config) {
+        item = config[j];
         if (Object.keys(item).indexOf('actions') != -1) {
-          for (var k in item.actions) {
-            var action = item.actions[k];
+          for (k in item.actions) {
+            action = item.actions[k];
             if (action.leads_to == i) {
               action.leads_to = null;
             }
@@ -286,11 +290,11 @@ var pbpmApp = new Vue(
         }
       }
       // ...and now let's decrement all subsequent leads_to pointers...
-      for (var j in config) {
-        var item = config[j];
+      for (j in config) {
+        item = config[j];
         if (Object.keys(item).indexOf('actions') != -1) {
-          for (var k in item.actions) {
-            var action = item.actions[k];
+          for (k in item.actions) {
+            action = item.actions[k];
             if (action.leads_to > i) {
               action.leads_to--;
             }
@@ -307,7 +311,7 @@ var pbpmApp = new Vue(
       this.svc.save();
     },
     createSubmit: function(e) {
-      var vars = {}
+      var vars = {};
       for (var i in this.form.vars) {
         vars[this.form.vars[i].var] = this.form.vars[i].val;
       }
@@ -321,9 +325,9 @@ var pbpmApp = new Vue(
         app.form.instance = data;
       });
     },
-    progressInstance: function(action_code = null, owner_code = null) {
+    progressInstance: function(action_code, owner_code) {
       var url = '/instance/progress/' + this.form.id;
-      if (action_code != null && owner_code != null) {
+      if (action_code != undefined && owner_code != undefined) {
         url = url + '/' + action_code + '/' + owner_code;
       }
       jQuery.get(url, {}, function(data) {
