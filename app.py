@@ -117,7 +117,7 @@ def graph(map_code):
     if item["type"] == "service":
       shape = "hexagon"
     elif item["type"] == "router":
-      shape = "diamond"
+      shape = "trapezium"
     else:
       shape = "box"
     dot.node(str(i), "{0}:{1}".format(item["type"], item["code"]), shape=shape)

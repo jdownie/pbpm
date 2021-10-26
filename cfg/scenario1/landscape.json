@@ -200,6 +200,62 @@
           ]
         }
       ]
+    },
+    "ERRORPRONE": {
+      "name": "Error Prone Workflow",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 4
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "A",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "router",
+          "code": "BADROUTER",
+          "actions": [
+            {
+              "code": "GT3",
+              "leads_to": 2
+            },
+            {
+              "code": "LT0",
+              "leads_to": 4
+            },
+            {
+              "code": "BAD",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "X",
+          "actions": [
+            {
+              "code": "FINE",
+              "leads_to": 3
+            },
+            {
+              "code": "BAIL",
+              "leads_to": 1
+            }
+          ]
+        }
+      ]
     }
   },
   "station": {
@@ -291,6 +347,23 @@
           "code": "COMPLETE"
         }
       ]
+    },
+    "X": {
+      "name": "X",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Fine",
+          "color": "#198754",
+          "code": "FINE"
+        },
+        {
+          "action_code": "",
+          "label": "Bail Out!",
+          "color": "#de8e02",
+          "code": "BAIL"
+        }
+      ]
     }
   },
   "service": {
@@ -299,6 +372,15 @@
     },
     "RANDOM": {
       "url_template": "http://localhost:5000/test/random/"
+    },
+    "JUNKURL": {
+      "url_template": "junkjunkjunk"
+    },
+    "BADURL": {
+      "url_template": "http://localhost:5000/nothing/"
+    },
+    "BADHOST": {
+      "url_template": "http://xxxxxxxxx.yyy/"
     }
   },
   "owner": {
@@ -340,6 +422,26 @@
           "action_code": "3",
           "label": "",
           "expression": "vars.r == 3"
+        }
+      ]
+    },
+    "BADROUTER": {
+      "description": "Testing dumb things",
+      "actions": [
+        {
+          "action_code": "GT3",
+          "label": "",
+          "expression": "int(vars.intVar) > 3"
+        },
+        {
+          "action_code": "LT0",
+          "label": "",
+          "expression": "int(vars.intVar) < 0"
+        },
+        {
+          "action_code": "BAD",
+          "label": "",
+          "expression": "( 1 + ) == 5"
         }
       ]
     }

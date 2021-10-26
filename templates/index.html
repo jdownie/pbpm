@@ -9,7 +9,7 @@
     <div id="pbpm">
       <div class="container-fluid" v-if="svc != null && svc.loading == 0">
         <div class="row editRouter" v-if="tab == 'editRouter'">
-          <h1>[[form.code]] - [[svc.landscape.router[form.code].description]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('router') ]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('router')">Exit</button>
           <div class="col datagrid">
             <table class="table">
@@ -130,7 +130,7 @@
                             class="list-group-item list-group-item-action"
                            :class="{ 'active': form.edit != null && form.edit.length == 2 && form.edit[0] == i && form.edit[1] == a }"
                             v-on:click.stop="mapSelect(i, a)">
-                      [[action.code]] - [[svc.landscape.router[node.code].actions[a].description]]
+                      [[action.code]][[ ( Object.keys(svc.landscape.router[node.code].actions).indexOf(a) == -1 ? '' : ' - ' + svc.landscape.router[node.code].actions[a].description )]]
                     </button>
                   </div>
                 </div>
@@ -150,7 +150,7 @@
                     <option></option>
                     <option v-for="record, i in svc.landscape.map[form.code].config" :value="i" v-if="i != form.edit[0]">[[ svc.landscape | configStepLabel(record, form.code, i) ]]</option>
                   </select>
-                  <button v-if="form.leads_to != '' && [ 'station', 'router' ].indexOf(svc.landscape.map[form.code].config[form.leads_to].type) == -1"
+                  <button v-if="form.leads_to != '' && Object.keys(svc.landscape.map[form.code].config).indexOf(form.leads_to) != -1 && [ 'station', 'router' ].indexOf(svc.landscape.map[form.code].config[form.leads_to].type) == -1"
                           class="btn btn-outline-secondary"
                           type="button"
                           v-on:click="mapSelect(form.leads_to)">🡆</button>
@@ -378,7 +378,7 @@
                       <tbody>
                         <tr v-for="entry, i in form.instance.log.slice().reverse()">
                           <td>[[entry.datetime | datetimeFormat]]</td>
-                          <td>[[entry.entry]]</td>
+                          <td><pre>[[entry.entry]]</pre></td>
                         </tr>
                       </tbody>
                     </table>

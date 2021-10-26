@@ -263,7 +263,7 @@ var pbpmApp = new Vue(
     resurrectInstance: function(e) {
       var url = '/instance/resurrect/' + this.form.id + '/' + this.form.bookmark + '/' + 'james.downie';
       jQuery.get(url, {}, function(data) {
-        this.selectTab('instances');
+        pbpmApp.selectTab('instances');
       });
     },
     delMapConfigItem: function(i) {
@@ -282,6 +282,23 @@ var pbpmApp = new Vue(
         if (Object.keys(item).indexOf('leads_to') != -1) {
           if (item.leads_to == i) {
             item.leads_to = null;
+          }
+        }
+      }
+      // ...and now let's decrement all subsequent leads_to pointers...
+      for (var j in config) {
+        var item = config[j];
+        if (Object.keys(item).indexOf('actions') != -1) {
+          for (var k in item.actions) {
+            var action = item.actions[k];
+            if (action.leads_to > i) {
+              action.leads_to--;
+            }
+          }
+        }
+        if (Object.keys(item).indexOf('leads_to') != -1) {
+          if (item.leads_to > i) {
+            item.leads_to--;
           }
         }
       }

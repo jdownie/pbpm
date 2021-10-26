@@ -166,6 +166,8 @@ class pbpm:
     config_item = self.landscape["map"][instance["map_code"]]["config"][bookmark]
     instance["log"].append(self.__log("Found station {0}".format(config_item["code"])))
     instance["station_code"] = config_item["code"]
+    if instance["station_code"] == "BEGIN":
+      self.progressInstance(id, owner_code = owner_code)
     self.instanceTimelineAdd(instance, "station", instance["station_code"], "ARRIVE", owner_code)
     self.saveInstance(id, instance)
 
@@ -215,19 +217,21 @@ class pbpm:
                 v = "\"{0}\"".format(v)
               vars.append("  {0} = {1}".format(k, v))
             expression = None
+            router_action_code = ""
             for router_action in router["actions"]:
               if config_action["code"] == router_action["action_code"]:
-                expression = "result = ({0})".format(router_action["expression"])
+                router_action_code = router_action["action_code"]
+                expression = "globals()[\"router_result\"] = ({0})".format(router_action["expression"])
             if leads_to == None and expression != None:
               expression = "\n".join([ "\n".join(vars), expression ])
-              instance["log"].append(self.__log(expression))
               try:
-                exec(expression, globals())
-                instance["log"].append(self.__log("Evaluated {0} to {1} for config action {2}".format(expression, result, config_action["code"])))
-                if result:
+                globals()["router_result"] = False
+                exec(expression)
+                instance["log"].append(self.__log("Evaluated...\n{0}\n...to\n{1}\n...for config action {2}".format(expression, globals()["router_result"], config_action["code"])))
+                if globals()["router_result"]:
                   leads_to = config_action["leads_to"]
               except Exception as e:
-                instance["log"].append(self.__log("ERROR: {0}".format(str(e))))
+                instance["log"].append(self.__log("ERROR: Evaluating...\n{0}\n...for router {1}:{2}.\nError message: {3}".format(expression, config[bookmark]["code"], router_action_code, str(e))))
                 instance["station_code"] = "ERROR"
                 break
           if leads_to != None:
@@ -235,6 +239,10 @@ class pbpm:
             bookmark = leads_to
             self.instanceTimelineAdd(instance, config[bookmark]["type"], config[bookmark]["code"], "ARRIVE", owner_code)
             instance["log"].append(self.__log("Shifted bookmark to {0}".format(bookmark)))
+          else:
+            instance["log"].append(self.__log("ERROR: Unable to resolve router to a new step."))
+            instance["station_code"] = "ERROR"
+            break
         elif config[bookmark]["type"] == "service":
           instance["log"].append(self.__log("Evaluating service {0}".format(config[bookmark]["code"])))
           service = self.landscape["service"][config[bookmark]["code"]]
