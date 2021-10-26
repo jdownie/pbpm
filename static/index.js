@@ -13,7 +13,7 @@ var pbpmApp = new Vue(
   mounted: function() {
     pbpm.load(function() {
       pbpmApp.svc = pbpm;
-      pbpmApp.selectTab('instances');
+      pbpmApp.selectTab('welcome');
       $('#pbpm').fadeIn();
     });
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);

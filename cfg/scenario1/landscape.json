@@ -98,7 +98,7 @@
             },
             {
               "code": "RANDOM",
-              "leads_to": 7
+              "leads_to": 5
             }
           ]
         },
@@ -123,37 +123,27 @@
           ]
         },
         {
-          "type": "station",
-          "code": "C",
-          "actions": [
-            {
-              "code": "LOOP",
-              "leads_to": 2
-            }
-          ]
-        },
-        {
-          "type": "router",
-          "code": "RANDOM",
-          "actions": [
-            {
-              "code": "1",
-              "leads_to": 3
-            },
-            {
-              "code": "2",
-              "leads_to": 4
-            },
-            {
-              "code": "3",
-              "leads_to": 5
-            }
-          ]
-        },
-        {
           "type": "service",
           "code": "RANDOM",
           "leads_to": 6
+        },
+        {
+          "type": "router",
+          "code": "STEPDECISION",
+          "actions": [
+            {
+              "code": "ComplexA",
+              "leads_to": 3
+            },
+            {
+              "code": "ComplexB",
+              "leads_to": 4
+            },
+            {
+              "code": "Default",
+              "leads_to": 2
+            }
+          ]
         }
       ]
     },
@@ -364,6 +354,35 @@
           "code": "BAIL"
         }
       ]
+    },
+    "NEWQA": {
+      "name": "New Style QA",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete QA (Prepress Okay)",
+          "color": "#198754",
+          "code": "COMPLETE"
+        },
+        {
+          "action_code": "",
+          "label": "Complete QA (Withhold Prepress Payment)",
+          "color": "#165035",
+          "code": "COMPLETENEG"
+        },
+        {
+          "action_code": "",
+          "label": "Reject QA (Prepress Failure)",
+          "color": "#ae0909",
+          "code": "REJECT"
+        },
+        {
+          "action_code": "",
+          "label": "Reject QA (Brief Failure)",
+          "color": "#214682",
+          "code": "REJECTPOS"
+        }
+      ]
     }
   },
   "service": {
@@ -442,6 +461,26 @@
           "action_code": "BAD",
           "label": "",
           "expression": "( 1 + ) == 5"
+        }
+      ]
+    },
+    "STEPDECISION": {
+      "description": "Should we Step this job?",
+      "actions": [
+        {
+          "action_code": "ComplexA",
+          "label": "",
+          "expression": "int(vars.r) == 2"
+        },
+        {
+          "action_code": "ComplexB",
+          "label": "",
+          "expression": "int(vars.r) == 3"
+        },
+        {
+          "action_code": "Default",
+          "label": "",
+          "expression": "True"
         }
       ]
     }

@@ -181,7 +181,64 @@
               </li>
             </ul>
             <div class="tabbody" v-if="tab == 'welcome'">
-              <h1>Welcome</h1>
+              <h1>Welcome to PBPM</h1>
+              <p>pbpm (<b>P</b>ython <b>B</b>usiness <b>P</b>rocess <b>M</b>odelling) is a lightweight engine for tracking process "instances" through process "maps". Although this is the provided user interface for this application, the intention is for this UI to only be used when process maps are being modified.</p>
+              <p>pbpm has been designed with a few goals in mind...</p>
+              <ul>
+                <ol>To be simple, lightweight and portable; preferably being hosted as a microservice behind a reverse proxy amongst a suite of other containers.</ol>
+                <ol>To manage it's configuration and state data in JSON formatted text files.</ol>
+                <ol>To interract with other business systems as simply as possible.</ol>
+              </ul>
+              <p>Here's a glossary of the terms that you'll find throughout pbpm...</p>
+              <div class="row">
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Maps</h5></div>
+                      <p class="mb-1">The various paths through a distinct collection of stations, services and routers.</p>
+                      <small>See <b>instances</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Stations</h5></div>
+                      <p class="mb-1">A place for a process instance to wait for somebody to complete their contribution before signalling the completion of that contribution with an "action".</p>
+                      <small>See <b>actions</b> and <b>maps</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Actions</h5></div>
+                      <p class="mb-1">The "way out" of a station, probably signalling a distinct sequence of events that should follow that particular type of completion from a station.</p>
+                      <small>See <b>stations</b>.</small>
+                    </a>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Instances</h5></div>
+                      <p class="mb-1">A distinct instance of <emph>something</emph> being progressed through a "map". Instances can (and should) be launched with a collection of variables that make the instance unique. These variables will probably form the basis of a number of service calls that will grow that list of variables and inform decisions through routers.</p>
+                      <small>See <b>maps</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Variables</h5></div>
+                      <p class="mb-1">Simple name/value pairs.</p>
+                      <small>See <b>instances</b> and <b>services</b>.</small>
+                    </a>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Services</h5></div>
+                      <p class="mb-1">A way for a process instance to ask an external system for additional information.</p>
+                      <small>See <b>variables</b> and <b>routers</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Routers</h5></div>
+                      <p class="mb-1">Junction boxes that allow for any number of python expressions to be evaluated. The first of those expressions to evaluate to true will determine the path out of that router and therefor the subsequent steps.</p>
+                      <small>See <b>variables</b> and <b>stations</b>.</small>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="tabbody graphviz" v-if="tab == 'graphviz'">
               <div class="row">
