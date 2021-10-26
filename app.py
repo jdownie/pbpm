@@ -90,13 +90,18 @@ def instanceCreate():
 
 @app.route('/instance/progress/<id>')
 def instanceProgress(id):
-  log = p.progressInstance(id)
-  return json.dumps(log)
+  p.progressInstance(id)
+  return id
 
 @app.route('/instance/progress/<id>/<action_code>/<owner_code>')
 def instanceProgressAction(id, action_code, owner_code):
-  log = p.progressInstance(id, action_code = action_code, owner_code = owner_code)
-  return json.dumps(log)
+  p.progressInstance(id, action_code = action_code, owner_code = owner_code)
+  return id
+
+@app.route('/instance/resurrect/<id>/<bookmark>/<owner_code>')
+def instanceResurrectAction(id, bookmark, owner_code):
+  log = p.resurrectInstance(id, bookmark = bookmark, owner_code = owner_code)
+  return id
 
 @app.route('/instances/active/')
 def instancesActive():
@@ -112,7 +117,7 @@ def graph(map_code):
     if item["type"] == "service":
       shape = "hexagon"
     elif item["type"] == "router":
-      shape = "diamond"
+      shape = "trapezium"
     else:
       shape = "box"
     dot.node(str(i), "{0}:{1}".format(item["type"], item["code"]), shape=shape)
@@ -120,7 +125,7 @@ def graph(map_code):
       for j in range(len(item["actions"])):
         dot.node("{0}.{1}".format(i, j), item["actions"][j]["code"], shape="cds")
         dot.edge(str(i), "{0}.{1}".format(i, j), constraint="true")
-        if "leads_to" in item["actions"][j].keys():
+        if "leads_to" in item["actions"][j].keys() and item["actions"][j]["leads_to"] != None:
           dot.edge("{0}.{1}".format(i, j), str(item["actions"][j]["leads_to"]), constraint="true")
     elif "leads_to" in item.keys():
       dot.edge(str(i), str(item["leads_to"]), constraint="true")

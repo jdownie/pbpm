@@ -9,7 +9,7 @@
     <div id="pbpm">
       <div class="container-fluid" v-if="svc != null && svc.loading == 0">
         <div class="row editRouter" v-if="tab == 'editRouter'">
-          <h1>[[form.code]] - [[svc.landscape.router[form.code].description]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('router') ]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('router')">Exit</button>
           <div class="col datagrid">
             <table class="table">
@@ -48,7 +48,7 @@
           </div>
         </div>
         <div class="row editStation" v-else-if="tab == 'editStation'">
-          <h1>[[form.code]] - [[svc.landscape.station[form.code].name]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('station') ]]</h1>
           <button class="btn btn-secondary exitButton" v-on:click="selectTab('station')">Exit</button>
           <div class="col datagrid">
             <table class="table">
@@ -82,14 +82,14 @@
           </div>
         </div>
         <div class="row editMap" v-else-if="tab == 'editMap'">
-          <h1>[[form.code]] - [[svc.landscape.map[form.code].name]]</h1>
+          <h1>[[form.code]] - [[ form.code | displayName('map') ]]</h1>
           <button class="btn btn-secondary form-control exitButton" v-on:click="selectTab('map')">Exit</button>
           <div class="col-6">
             <div class="input-group mb-1">
               <span class="input-group-text" id="basic-addon1">Add a Station</span>
               <select class="form-control" v-on:change="mapAddStation" v-model="form.add.station_code">
                 <option></option>
-                <option v-for="record, code in svc.landscape.station" :value="code">[[code]]: [[record.name]]</option>
+                <option v-for="record, code in svc.landscape.station" :value="code">[[code]]: [[ code | displayName('station') ]]</option>
               </select>
             </div>
             <div class="input-group mb-1">
@@ -113,7 +113,7 @@
                   v-on:click="mapSelect(i)">
                 <div class="ms-2 me-auto">
                   <div class="fw-bold">[[node.code]]</div>
-                  <span v-if="svc.landscape.station[node.code] != undefined">[[svc.landscape.station[node.code].name]]</span>
+                  <span v-if="svc.landscape.station[node.code] != undefined">[[ node.code | displayName('station') ]]</span>
                   <div class="list-group stationActions" v-if="svc.landscape.station[node.code] != undefined && svc.landscape.station[node.code].actions != undefined">
                     <button v-for="action, a in node.actions"
                             type="button"
@@ -130,7 +130,7 @@
                             class="list-group-item list-group-item-action"
                            :class="{ 'active': form.edit != null && form.edit.length == 2 && form.edit[0] == i && form.edit[1] == a }"
                             v-on:click.stop="mapSelect(i, a)">
-                      [[action.code]] - [[svc.landscape.router[node.code].actions[a].description]]
+                      [[action.code]][[ ( Object.keys(svc.landscape.router[node.code].actions).indexOf(a) == -1 ? '' : ' - ' + svc.landscape.router[node.code].actions[a].description )]]
                     </button>
                   </div>
                 </div>
@@ -150,7 +150,7 @@
                     <option></option>
                     <option v-for="record, i in svc.landscape.map[form.code].config" :value="i" v-if="i != form.edit[0]">[[ svc.landscape | configStepLabel(record, form.code, i) ]]</option>
                   </select>
-                  <button v-if="form.leads_to != '' && [ 'station', 'router' ].indexOf(svc.landscape.map[form.code].config[form.leads_to].type) == -1"
+                  <button v-if="form.leads_to != '' && Object.keys(svc.landscape.map[form.code].config).indexOf(form.leads_to) != -1 && [ 'station', 'router' ].indexOf(svc.landscape.map[form.code].config[form.leads_to].type) == -1"
                           class="btn btn-outline-secondary"
                           type="button"
                           v-on:click="mapSelect(form.leads_to)">🡆</button>
@@ -158,7 +158,7 @@
               </div>
             </div>
             <hr />
-            <div id="diagram"></div>
+            <img :src="'/graph/' + form.code + '.svg?renderTrigger=' + form.renderTrigger" />
           </div>
         </div>
         <div class="row tables" v-else>
@@ -181,7 +181,64 @@
               </li>
             </ul>
             <div class="tabbody" v-if="tab == 'welcome'">
-              <h1>Welcome</h1>
+              <h1>Welcome to PBPM</h1>
+              <p>pbpm (<b>P</b>ython <b>B</b>usiness <b>P</b>rocess <b>M</b>odelling) is a lightweight engine for tracking process "instances" through process "maps". Although this is the provided user interface for this application, the intention is for this UI to only be used when process maps are being modified.</p>
+              <p>pbpm has been designed with a few goals in mind...</p>
+              <ul>
+                <ol>To be simple, lightweight and portable; preferably being hosted as a microservice behind a reverse proxy amongst a suite of other containers.</ol>
+                <ol>To manage it's configuration and state data in JSON formatted text files.</ol>
+                <ol>To interract with other business systems as simply as possible.</ol>
+              </ul>
+              <p>Here's a glossary of the terms that you'll find throughout pbpm...</p>
+              <div class="row">
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Maps</h5></div>
+                      <p class="mb-1">The various paths through a distinct collection of stations, services and routers.</p>
+                      <small>See <b>instances</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Stations</h5></div>
+                      <p class="mb-1">A place for a process instance to wait for somebody to complete their contribution before signalling the completion of that contribution with an "action".</p>
+                      <small>See <b>actions</b> and <b>maps</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Actions</h5></div>
+                      <p class="mb-1">The "way out" of a station, probably signalling a distinct sequence of events that should follow that particular type of completion from a station.</p>
+                      <small>See <b>stations</b>.</small>
+                    </a>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Instances</h5></div>
+                      <p class="mb-1">A distinct instance of <i>something</i> being progressed through a "map". Instances can (and should) be launched with a collection of variables that make the instance unique. These variables will probably form the basis of a number of service calls that will grow that list of variables and inform decisions through routers.</p>
+                      <small>See <b>maps</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Variables</h5></div>
+                      <p class="mb-1">Simple name/value pairs.</p>
+                      <small>See <b>instances</b> and <b>services</b>.</small>
+                    </a>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Services</h5></div>
+                      <p class="mb-1">A way for a process instance to ask an external system for additional information.</p>
+                      <small>See <b>variables</b> and <b>routers</b>.</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between"><h5 class="mb-1">Routers</h5></div>
+                      <p class="mb-1">Junction boxes that allow for any number of python expressions to be evaluated. The first of those expressions to evaluate to true will determine the path out of that router and therefor the subsequent steps.</p>
+                      <small>See <b>variables</b> and <b>stations</b>.</small>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="tabbody graphviz" v-if="tab == 'graphviz'">
               <div class="row">
@@ -190,7 +247,7 @@
                     <li class="list-group-item"
                        :class="{ 'active': code== form.code }"
                         v-on:click="form.code = ( code == form.code ? '' : code )"
-                        v-for="record, code in svc.landscape.map">[[code]]: [[record.name]]</li>
+                        v-for="record, code in svc.landscape.map">[[code]]: [[ code | displayName('map') ]]</li>
                   </ul>
                 </div>
                 <div class="col-10">
@@ -237,6 +294,9 @@
               </div>
             </div>
             <div class="tabbody instances" v-if="tab == 'instances'">
+              <button class="btn btn-secondary exitButton"
+              v-if="form.instance != null"
+                      v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Close Instance</button>
               <div v-if="form.id == null">
                 <h1>[[ Object.keys(svc.activeInstances).length ]] Active Instances</h1>
                 <hr />
@@ -253,33 +313,45 @@
                     <tr v-for="instance, id in svc.activeInstances" v-on:click="form.id = id; loadInstance(id)">
                       <td>[[ id ]]</td>
                       <td>[[ instance.map_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.map).indexOf(instance.map_code) == -1 ? '' : svc.landscape.map[instance.map_code].name ) ]]</td>
+                      <td>[[ instance.map_code | displayName('map') ]]</td>
                       <td>[[ instance.station_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.station).indexOf(instance.station_code) == -1 ? '' : svc.landscape.station[instance.station_code].name ) ]]</td>
+                      <td>[[ instance.station_code | displayName('station') ]]</td>
                       <td>[[ instance.owner_code ]]</td>
-                      <td>[[ ( Object.keys(svc.landscape.owner).indexOf(instance.owner_code) == -1 ? '' : svc.landscape.owner[instance.owner_code].name ) ]]</td>
+                      <td>[[ instance.owner_code | displayName('owner') ]]</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="" v-else-if="form.instance != null && form.instance.station_code == 'END'">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>This instance has completed.</h1>
               </div>
               <div class="" v-else-if="form.instance != null && form.instance.station_code == 'ERROR'">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
-                <h1>This instance is in ERROR.</h1>
-                    <table class="table log">
-                      <tbody>
-                        <tr v-for="entry, i in form.instance.log.slice().reverse()">
-                          <td>[[entry.datetime | datetimeFormat]]</td>
-                          <td><pre>[[entry.entry]]</pre></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div class="row">
+                  <div class="col">
+                    <h1>This instance is in ERROR.</h1>
+                  </div>
+                  <div class="col">
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text" id="basic-addon1">Resurrect on...</span>
+                      <select class="form-control" v-model="form.bookmark" v-on:change="resurrectInstance">
+                        <option></option>
+                        <option v-for="record, i in svc.landscape.map[form.instance.map_code].config"
+                               :value="i"
+                                v-if="record.type == 'station' && [ 'END' ].indexOf(record.code) == -1">[[ svc.landscape | configStepLabel(record, form.code, i) ]]</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <table class="table log">
+                  <tbody>
+                    <tr v-for="entry, i in form.instance.log.slice().reverse()">
+                      <td>[[entry.datetime | datetimeFormat]]</td>
+                      <td><pre>[[entry.entry]]</pre></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
               <div class="instance" v-else-if="form.instance != null">
-                <button class="btn btn-secondary exitButton" v-on:click="form.id = null; form.instance = null; svc.instances.active.load();">Exit</button>
                 <h1>[[form.id]]</h1>
                 <hr />
                 <div class="row" v-if="form.instance != null">
@@ -290,29 +362,32 @@
                         <tr>
                           <th>Map</th>
                           <td>[[form.instance.map_code]]</td>
-                          <td>[[svc.landscape.map[form.instance.map_code].name]]</td>
+                          <td>[[ form.instance.map_code | displayName('map') ]]</td>
                         </tr>
                         <tr>
                           <th>Station</th>
                           <td>[[form.instance.station_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.station).indexOf(form.instance.station_code) == -1 ? '' : svc.landscape.station[form.instance.station_code].name ) ]]</td>
+                          <td>[[ form.instance.station_code | displayName('station') ]]</td>
                         </tr>
                         <tr>
                           <th>Owner</th>
                           <td>[[form.instance.owner_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(form.instance.owner_code) == -1 ? '' : svc.landscape.owner[form.instance.owner_code].name ) ]]</td>
+                          <td>[[ form.instance.owner_code | displayName('owner') ]]</td>
                         </tr>
                       </tbody>
                     </table>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Owner</span>
+                      <select class="form-control" v-model="form.owner_code">
+                        <option v-for="owner, owner_code in svc.landscape.owner" :value="owner_code">[[owner.name]]</option>
+                      </select>
+                    </div>
                     <button class="btn btn-success form-control mb-3" v-if="form.instance.station_code == 'BEGIN'" v-on:click="progressInstance(null)">Progress</button>
                     <button class="btn btn-success form-control mb-3"
                            :style="{ 'background-color': action.color }"
                             v-if="Object.keys(svc.landscape.station).indexOf(form.instance.station_code) != -1 && Object.keys(svc.landscape.station[form.instance.station_code]).indexOf('actions') != -1"
                             v-for="action, a in svc.landscape.station[form.instance.station_code].actions"
-                            v-on:click="progressInstance(action.code, 'james.downie')">[[action.code]]: [[action.label]]</button>
-                    <ol style="font-family: monospace;" v-if="form.progressLog.length > 0">
-                      <li v-for="entry, i in form.progressLog">[[entry.entry]]</li>
-                    </ol>
+                            v-on:click="progressInstance(action.code, form.owner_code)">[[action.code]]: [[action.label]]</button>
                   </div>
                   <div class="col-3 variables">
                     <h2>Variables</h2>
@@ -347,7 +422,7 @@
                           <td>[[entry.datetime | datetimeFormat]]</td>
                           <td>[[entry.event_code]]</td>
                           <td>[[entry.node_type]]:[[entry.node_code]]</td>
-                          <td>[[ ( Object.keys(svc.landscape.owner).indexOf(entry.owner_code) == -1 ? '' : svc.landscape.owner[entry.owner_code].name ) ]]</td>
+                          <td>[[ entry.owner_code | displayName('owner') ]]</td>
                         </tr>
                       </tbody>
                     </table>
@@ -360,7 +435,7 @@
                       <tbody>
                         <tr v-for="entry, i in form.instance.log.slice().reverse()">
                           <td>[[entry.datetime | datetimeFormat]]</td>
-                          <td>[[entry.entry]]</td>
+                          <td><pre>[[entry.entry]]</pre></td>
                         </tr>
                       </tbody>
                     </table>

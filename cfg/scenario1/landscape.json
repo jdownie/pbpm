@@ -28,17 +28,12 @@
           "leads_to": 2
         },
         {
-          "type": "service",
-          "code": "RANDOM",
-          "leads_to": 5
-        },
-        {
           "type": "station",
           "code": "QA",
           "actions": [
             {
               "code": "COMPLETE",
-              "leads_to": 6
+              "leads_to": 5
             },
             {
               "code": "REJECT",
@@ -47,15 +42,34 @@
           ]
         },
         {
+          "type": "service",
+          "code": "RANDOM",
+          "leads_to": 6
+        },
+        {
           "type": "router",
           "code": "RANDOM",
           "actions": [
             {
-              "code": "T1",
+              "code": "1",
               "leads_to": 2
             },
             {
-              "code": "T2",
+              "code": "2",
+              "leads_to": 7
+            },
+            {
+              "code": "3",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "STEP",
+          "actions": [
+            {
+              "code": "COMPLETE",
               "leads_to": 1
             }
           ]
@@ -84,7 +98,7 @@
             },
             {
               "code": "RANDOM",
-              "leads_to": 7
+              "leads_to": 5
             }
           ]
         },
@@ -109,37 +123,27 @@
           ]
         },
         {
-          "type": "station",
-          "code": "C",
-          "actions": [
-            {
-              "code": "LOOP",
-              "leads_to": 2
-            }
-          ]
-        },
-        {
-          "type": "router",
-          "code": "RANDOM",
-          "actions": [
-            {
-              "code": "1",
-              "leads_to": 3
-            },
-            {
-              "code": "2",
-              "leads_to": 4
-            },
-            {
-              "code": "3",
-              "leads_to": 5
-            }
-          ]
-        },
-        {
           "type": "service",
           "code": "RANDOM",
           "leads_to": 6
+        },
+        {
+          "type": "router",
+          "code": "STEPDECISION",
+          "actions": [
+            {
+              "code": "ComplexA",
+              "leads_to": 3
+            },
+            {
+              "code": "ComplexB",
+              "leads_to": 4
+            },
+            {
+              "code": "Default",
+              "leads_to": 2
+            }
+          ]
         }
       ]
     },
@@ -181,6 +185,62 @@
           "actions": [
             {
               "code": "LOOP",
+              "leads_to": 1
+            }
+          ]
+        }
+      ]
+    },
+    "ERRORPRONE": {
+      "name": "Error Prone Workflow",
+      "config": [
+        {
+          "type": "station",
+          "code": "BEGIN",
+          "leads_to": 4
+        },
+        {
+          "type": "station",
+          "code": "END"
+        },
+        {
+          "type": "station",
+          "code": "A",
+          "actions": [
+            {
+              "code": "LOOP",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "router",
+          "code": "BADROUTER",
+          "actions": [
+            {
+              "code": "GT3",
+              "leads_to": 2
+            },
+            {
+              "code": "LT0",
+              "leads_to": 4
+            },
+            {
+              "code": "BAD",
+              "leads_to": 1
+            }
+          ]
+        },
+        {
+          "type": "station",
+          "code": "X",
+          "actions": [
+            {
+              "code": "FINE",
+              "leads_to": 3
+            },
+            {
+              "code": "BAIL",
               "leads_to": 1
             }
           ]
@@ -266,6 +326,63 @@
           "code": "RANDOM"
         }
       ]
+    },
+    "STEP": {
+      "name": "Step",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete",
+          "color": "#198754",
+          "code": "COMPLETE"
+        }
+      ]
+    },
+    "X": {
+      "name": "X",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Fine",
+          "color": "#198754",
+          "code": "FINE"
+        },
+        {
+          "action_code": "",
+          "label": "Bail Out!",
+          "color": "#de8e02",
+          "code": "BAIL"
+        }
+      ]
+    },
+    "NEWQA": {
+      "name": "New Style QA",
+      "actions": [
+        {
+          "action_code": "",
+          "label": "Complete QA (Prepress Okay)",
+          "color": "#198754",
+          "code": "COMPLETE"
+        },
+        {
+          "action_code": "",
+          "label": "Complete QA (Withhold Prepress Payment)",
+          "color": "#165035",
+          "code": "COMPLETENEG"
+        },
+        {
+          "action_code": "",
+          "label": "Reject QA (Prepress Failure)",
+          "color": "#ae0909",
+          "code": "REJECT"
+        },
+        {
+          "action_code": "",
+          "label": "Reject QA (Brief Failure)",
+          "color": "#214682",
+          "code": "REJECTPOS"
+        }
+      ]
     }
   },
   "service": {
@@ -274,6 +391,15 @@
     },
     "RANDOM": {
       "url_template": "http://localhost:5000/test/random/"
+    },
+    "JUNKURL": {
+      "url_template": "junkjunkjunk"
+    },
+    "BADURL": {
+      "url_template": "http://localhost:5000/nothing/"
+    },
+    "BADHOST": {
+      "url_template": "http://xxxxxxxxx.yyy/"
     }
   },
   "owner": {
@@ -315,6 +441,46 @@
           "action_code": "3",
           "label": "",
           "expression": "vars.r == 3"
+        }
+      ]
+    },
+    "BADROUTER": {
+      "description": "Testing dumb things",
+      "actions": [
+        {
+          "action_code": "GT3",
+          "label": "",
+          "expression": "int(vars.intVar) > 3"
+        },
+        {
+          "action_code": "LT0",
+          "label": "",
+          "expression": "int(vars.intVar) < 0"
+        },
+        {
+          "action_code": "BAD",
+          "label": "",
+          "expression": "( 1 + ) == 5"
+        }
+      ]
+    },
+    "STEPDECISION": {
+      "description": "Should we Step this job?",
+      "actions": [
+        {
+          "action_code": "ComplexA",
+          "label": "",
+          "expression": "int(vars.r) == 2"
+        },
+        {
+          "action_code": "ComplexB",
+          "label": "",
+          "expression": "int(vars.r) == 3"
+        },
+        {
+          "action_code": "Default",
+          "label": "",
+          "expression": "True"
         }
       ]
     }

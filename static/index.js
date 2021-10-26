@@ -13,12 +13,26 @@ var pbpmApp = new Vue(
   mounted: function() {
     pbpm.load(function() {
       pbpmApp.svc = pbpm;
-      pbpmApp.selectTab('instances');
+      pbpmApp.selectTab('welcome');
       $('#pbpm').fadeIn();
     });
     window.addEventListener("dblclick", function(event) { pbpmApp.cfg.debug = ! pbpmApp.cfg.debug; }, false);
   },
   filters: {
+    displayName: function(code, type) {
+      ret = '';
+      if (Object.keys(pbpmApp.svc.landscape[type]).indexOf(code) != -1) {
+        cols = [ 'name', 'url_template' ];
+        var col = null;
+        for (var i in cols) {
+          if (col == null && Object.keys(pbpmApp.svc.landscape[type][code]).indexOf(cols[i]) != -1) {
+            col = cols[i];
+          }
+        }
+        ret = ( col == null ? code : pbpmApp.svc.landscape[type][code][col] );
+      }
+      return ret;
+    },
     datetimeFormat: function(utc) {
       var ret = moment(utc).format('D MMM, H:mm:sa');
       return ret;
@@ -58,6 +72,7 @@ var pbpmApp = new Vue(
         record.actions = dstActions;
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.station_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -66,6 +81,7 @@ var pbpmApp = new Vue(
         var record = { 'type': 'service', 'code': this.form.add.service_code };
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.service_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -81,6 +97,7 @@ var pbpmApp = new Vue(
         record.actions = dstActions;
         this.svc.landscape.map[this.form.code].config.push(record);
         this.form.add.router_code = '';
+        this.form.renderTrigger++;
         this.svc.save();
       }
     },
@@ -166,6 +183,7 @@ var pbpmApp = new Vue(
         node = node.actions[src[1]];
       }
       node.leads_to = dst;
+      this.form.renderTrigger++;
       this.svc.save();
     },
     editStation: function(code) {
@@ -210,7 +228,7 @@ var pbpmApp = new Vue(
     },
     editMap: function(code) {
       this.selectTab('editMap');
-      this.form = { 'code': code, 'add': { 'station_code': '', 'service_code': '', 'router_code': '' }, 'edit': null, 'leads_to': '' };
+      this.form = { 'code': code, 'add': { 'station_code': '', 'service_code': '', 'router_code': '' }, 'edit': null, 'leads_to': '', 'renderTrigger': 0 };
     },
     resetForm: function() {
       var map = this.svc.cfg.table;
@@ -230,7 +248,7 @@ var pbpmApp = new Vue(
         vars.push({ 'var': 'floatVar', 'val': 7.3 });
         this.form = { 'vars': vars, 'map_code': 'ND', 'owner_code': 'ringo.starr' };
       } else if (this.tab == 'instances') {
-        this.form = { 'id': null, 'instance': null, 'progressLog': [] };
+        this.form = { 'id': null, 'instance': null, 'bookmark': '', 'owner_code': 'john.doe' };
         this.svc.instances.active.load();
       } else if (this.tab == 'graphviz') {
         this.form = { 'code': Object.keys(this.svc.landscape.map)[0] };
@@ -242,12 +260,58 @@ var pbpmApp = new Vue(
       this.tab = tab;
       this.resetForm();
     },
+    resurrectInstance: function(e) {
+      var url = '/instance/resurrect/' + this.form.id + '/' + this.form.bookmark + '/' + 'james.downie';
+      jQuery.get(url, {}, function(data) {
+        pbpmApp.selectTab('instances');
+      });
+    },
     delMapConfigItem: function(i) {
+      // First, make sure that nothing leads to this index...
+      var config = this.svc.landscape.map[this.form.code].config;
+      var item = null;
+      var action = null;
+      var j = null;
+      var k = null;
+      for (j in config) {
+        item = config[j];
+        if (Object.keys(item).indexOf('actions') != -1) {
+          for (k in item.actions) {
+            action = item.actions[k];
+            if (action.leads_to == i) {
+              action.leads_to = null;
+            }
+          }
+        }
+        if (Object.keys(item).indexOf('leads_to') != -1) {
+          if (item.leads_to == i) {
+            item.leads_to = null;
+          }
+        }
+      }
+      // ...and now let's decrement all subsequent leads_to pointers...
+      for (j in config) {
+        item = config[j];
+        if (Object.keys(item).indexOf('actions') != -1) {
+          for (k in item.actions) {
+            action = item.actions[k];
+            if (action.leads_to > i) {
+              action.leads_to--;
+            }
+          }
+        }
+        if (Object.keys(item).indexOf('leads_to') != -1) {
+          if (item.leads_to > i) {
+            item.leads_to--;
+          }
+        }
+      }
       this.svc.landscape.map[this.form.code].config.splice(i, 1);
+      this.form.renderTrigger++;
       this.svc.save();
     },
     createSubmit: function(e) {
-      var vars = {}
+      var vars = {};
       for (var i in this.form.vars) {
         vars[this.form.vars[i].var] = this.form.vars[i].val;
       }
@@ -261,14 +325,13 @@ var pbpmApp = new Vue(
         app.form.instance = data;
       });
     },
-    progressInstance: function(action_code = null, owner_code = null) {
+    progressInstance: function(action_code, owner_code) {
       var url = '/instance/progress/' + this.form.id;
-      if (action_code != null && owner_code != null) {
+      if (action_code != undefined && owner_code != undefined) {
         url = url + '/' + action_code + '/' + owner_code;
       }
       jQuery.get(url, {}, function(data) {
-        var j = JSON.parse(data);
-        pbpmApp.form.progressLog = j;
+        console.log(data);
         pbpmApp.loadInstance(pbpmApp.form.id);
       });
     }
