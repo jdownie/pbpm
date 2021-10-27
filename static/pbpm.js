@@ -5,12 +5,12 @@ var pbpm =
   cfg: {},
   load: function(cb) {
     var instance = this;
-    jQuery.get( '/cfg/table.json',
+    jQuery.get( '../cfg/table.json',
                 {},
                 function(data) {
                   instance.cfg.table = data;
                   instance.loading--;
-                  jQuery.get( '/landscape/get/',
+                  jQuery.get( '../landscape/get/',
                               {},
                               function(data) {
                                 instance.landscape = data;
@@ -27,7 +27,7 @@ var pbpm =
   },
   save: function(cb) {
     var instance = this;
-    jQuery.post( '/landscape/put/',
+    jQuery.post( '../landscape/put/',
                  JSON.stringify(instance.landscape),
                  function(data) {
                    instance.landscape = data;
@@ -39,7 +39,7 @@ var pbpm =
     active: {
       load: function() {
         var instance = this;
-        jQuery.get( '/instances/active/',
+        jQuery.get( '../instances/active/',
                     {},
                     function(data) {
                       pbpm.activeInstances = data;

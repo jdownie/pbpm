@@ -243,10 +243,8 @@ var pbpmApp = new Vue(
         this.vueRender();
       } else if (this.tab == 'create') {
         var vars = [];
-        vars.push({ 'var': 'intVar', 'val': -7 });
-        vars.push({ 'var': 'charVar', 'val': 'AAA' });
-        vars.push({ 'var': 'floatVar', 'val': 7.3 });
-        this.form = { 'vars': vars, 'map_code': 'ND', 'owner_code': 'ringo.starr' };
+        vars.push({ 'var': 'coreid', 'val': '7207102' });
+        this.form = { 'vars': vars, 'map_code': 'TEST', 'owner_code': 'john.doe' };
       } else if (this.tab == 'instances') {
         this.form = { 'id': null, 'instance': null, 'bookmark': '', 'owner_code': 'john.doe' };
         this.svc.instances.active.load();
@@ -261,7 +259,7 @@ var pbpmApp = new Vue(
       this.resetForm();
     },
     resurrectInstance: function(e) {
-      var url = '/instance/resurrect/' + this.form.id + '/' + this.form.bookmark + '/' + 'james.downie';
+      var url = '../instance/resurrect/' + this.form.id + '/' + this.form.bookmark + '/' + 'john.doe';
       jQuery.get(url, {}, function(data) {
         pbpmApp.selectTab('instances');
       });
@@ -315,18 +313,18 @@ var pbpmApp = new Vue(
       for (var i in this.form.vars) {
         vars[this.form.vars[i].var] = this.form.vars[i].val;
       }
-      jQuery.post('/instance/create/', { 'map_code': this.form.map_code, 'owner_code': this.form.owner_code, 'vars': JSON.stringify(vars) }, function(data) {
+      jQuery.post('../instance/create/', { 'map_code': this.form.map_code, 'owner_code': this.form.owner_code, 'vars': JSON.stringify(vars) }, function(data) {
         console.log(data);
       });
     },
     loadInstance: function(id) {
       var app = this;
-      jQuery.get('/instance/' + id, {}, function(data) {
+      jQuery.get('../instance/' + id, {}, function(data) {
         app.form.instance = data;
       });
     },
     progressInstance: function(action_code, owner_code) {
-      var url = '/instance/progress/' + this.form.id;
+      var url = '../instance/progress/' + this.form.id;
       if (action_code != undefined && owner_code != undefined) {
         url = url + '/' + action_code + '/' + owner_code;
       }
